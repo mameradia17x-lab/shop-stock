@@ -147,7 +147,6 @@ small{font-size:13px;color:var(--muted)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(100px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;font-size:14px;font-weight:600;z-index:40;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion: no-preference){.panel{animation:rise .18s ease-out}@keyframes rise{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}}
 
-#installBtn{position:fixed;right:16px;bottom:calc(100px + env(safe-area-inset-bottom,0px));z-index:25;box-shadow:0 6px 16px rgba(0,0,0,.25)}
 </style>
 
 <div id="app"></div>
@@ -709,18 +708,9 @@ render();
 })();
 </script>
 
-<button class="btn primary" id="installBtn" hidden>Install app</button>
 <script>
 (function(){
   try{if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}}catch(e){}
-  var dp=null,b=document.getElementById('installBtn'),KEYI='shop-stock.installed';
-  var isApp=function(){try{return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;}catch(e){return false;}};
-  var wasInstalled=function(){try{return localStorage.getItem(KEYI)==='1';}catch(e){return false;}};
-  var markInstalled=function(){try{localStorage.setItem(KEYI,'1');}catch(e){}};
-  if(isApp())markInstalled();
-  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();dp=e;if(!isApp()&&!wasInstalled())b.hidden=false;});
-  b.addEventListener('click',function(){if(!dp)return;dp.prompt();dp.userChoice.then(function(c){dp=null;b.hidden=true;if(c&&c.outcome==='accepted')markInstalled();});});
-  window.addEventListener('appinstalled',function(){dp=null;b.hidden=true;markInstalled();});
 })();
 </script>
 
