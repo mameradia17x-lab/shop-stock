@@ -713,10 +713,14 @@ render();
 <script>
 (function(){
   try{if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}}catch(e){}
-  var dp=null,b=document.getElementById('installBtn');
-  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();dp=e;b.hidden=false;});
-  b.addEventListener('click',function(){if(!dp)return;dp.prompt();dp.userChoice.then(function(){dp=null;b.hidden=true;});});
-  window.addEventListener('appinstalled',function(){dp=null;b.hidden=true;});
+  var dp=null,b=document.getElementById('installBtn'),KEYI='shop-stock.installed';
+  var isApp=function(){try{return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;}catch(e){return false;}};
+  var wasInstalled=function(){try{return localStorage.getItem(KEYI)==='1';}catch(e){return false;}};
+  var markInstalled=function(){try{localStorage.setItem(KEYI,'1');}catch(e){}};
+  if(isApp())markInstalled();
+  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();dp=e;if(!isApp()&&!wasInstalled())b.hidden=false;});
+  b.addEventListener('click',function(){if(!dp)return;dp.prompt();dp.userChoice.then(function(c){dp=null;b.hidden=true;if(c&&c.outcome==='accepted')markInstalled();});});
+  window.addEventListener('appinstalled',function(){dp=null;b.hidden=true;markInstalled();});
 })();
 </script>
 
