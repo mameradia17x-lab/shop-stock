@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F3F5F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0B121C" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Shop Stock">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+<body>
+<title>Shop Stock</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Ethiopic:wght@400;600;700&display=swap">
+<style>
+/* Layout: one phone-width column, five tabs along the bottom, forms open as bottom sheets. */
+:root{
+  --font:'Plus Jakarta Sans','Noto Sans Ethiopic',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --bg:#F3F5F7; --surface:#FFFFFF; --ink:#0F1B2D; --muted:#566275; --line:#E1E6EC;
+  --field-line:#B9C3CF; --accent:#0E7C66; --accent-ink:#FFFFFF; --accent-soft:#E2F3EE;
+  --hero:#0F1B2D; --hero-ink:#FFFFFF; --hero-muted:#A9B6C6; --hero-line:#2B3A52;
+  --bad:#B42318; --bad-bg:#FDE7E5; --warn:#7A4100; --warn-bg:#FFEBCF; --good:#0B6150; --good-bg:#E2F3EE;
+  --seg:#E3E8EE; --scrim:rgba(15,27,45,.5);
+  --gA-bg:#0B6150; --gA-fg:#FFFFFF; --gB-bg:#BFE6DA; --gB-fg:#0B3D33; --gC-bg:#FFE3A3; --gC-fg:#5C3B00;
+  --gD-bg:#F4B58A; --gD-fg:#4A2000; --gE-bg:#D5DAE1; --gE-fg:#243044;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B121C; --surface:#131D2B; --ink:#EAF0F7; --muted:#9AA8BB; --line:#243247;
+    --field-line:#3A4B63; --accent:#3CC5A3; --accent-ink:#04231B; --accent-soft:#12342C;
+    --hero:#1B2A40; --hero-ink:#FFFFFF; --hero-muted:#A9B6C6; --hero-line:#2F4262;
+    --bad:#FF9A90; --bad-bg:#3A1C1C; --warn:#FFC46B; --warn-bg:#3A2A10; --good:#7FD6C0; --good-bg:#12342C;
+    --seg:#1B2738; --scrim:rgba(0,0,0,.65);
+    --gA-bg:#3CC5A3; --gA-fg:#04231B; --gB-bg:#1F4A40; --gB-fg:#BFE6DA; --gC-bg:#4A3A12; --gC-fg:#FFE3A3;
+    --gD-bg:#55301A; --gD-fg:#F4B58A; --gE-bg:#2A3547; --gE-fg:#C5CEDB;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B121C; --surface:#131D2B; --ink:#EAF0F7; --muted:#9AA8BB; --line:#243247;
+  --field-line:#3A4B63; --accent:#3CC5A3; --accent-ink:#04231B; --accent-soft:#12342C;
+  --hero:#1B2A40; --hero-ink:#FFFFFF; --hero-muted:#A9B6C6; --hero-line:#2F4262;
+  --bad:#FF9A90; --bad-bg:#3A1C1C; --warn:#FFC46B; --warn-bg:#3A2A10; --good:#7FD6C0; --good-bg:#12342C;
+  --seg:#1B2738; --scrim:rgba(0,0,0,.65);
+  --gA-bg:#3CC5A3; --gA-fg:#04231B; --gB-bg:#1F4A40; --gB-fg:#BFE6DA; --gC-bg:#4A3A12; --gC-fg:#FFE3A3;
+  --gD-bg:#55301A; --gD-fg:#F4B58A; --gE-bg:#2A3547; --gE-fg:#C5CEDB;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.4;padding-inline:16px;padding-block:calc(16px + env(safe-area-inset-top,0px)) 112px;-webkit-text-size-adjust:100%}
+#app{max-width:480px;margin-inline:auto;display:flex;flex-direction:column;gap:14px}
+h1,h2,h3,p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+small{font-size:13px;color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.top h1{font-size:24px;font-weight:800;letter-spacing:-.2px}
+.sub{font-size:13px;color:var(--muted);margin-top:2px}
+.iconbtn{flex:none;width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--surface);display:flex;align-items:center;justify-content:center;padding:0}
+.iconbtn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:14px 16px}
+.card.flush{padding-block:4px}
+.card h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.hero{background:var(--hero);color:var(--hero-ink);border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:16px}
+.hero .label{font-size:13px;color:var(--hero-muted)}
+.hero .big{font-size:38px;font-weight:800;letter-spacing:-.5px;margin-top:4px}
+.hero .big span{font-size:15px;font-weight:600;color:var(--hero-muted);margin-left:6px}
+.hero .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;border-top:1px solid var(--hero-line);padding-top:14px}
+.hero .stats b{display:block;font-size:16px;margin-top:2px}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;text-align:left;display:block;width:100%}
+.tile b{display:block;font-size:26px;font-weight:800}
+.tile span{font-size:13px;color:var(--muted)}
+.tiles2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.btn{min-height:48px;border-radius:14px;border:1px solid var(--field-line);background:var(--surface);color:var(--ink);font-weight:700;padding:0 16px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.armed{background:var(--bad);color:#fff;border-color:var(--bad)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.wide{width:100%}
+.btns{display:flex;gap:12px}
+.btns>*{flex:1}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;min-height:44px;min-width:44px;padding:0 16px;border-radius:999px;border:1px solid var(--field-line);background:var(--surface);font-weight:600;font-size:14px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.seg{display:flex;gap:4px;padding:4px;border-radius:16px;background:var(--seg)}
+.seg button{flex:1;min-height:44px;border-radius:12px;border:none;background:transparent;font-weight:700;font-size:14px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.search{display:flex;align-items:center;gap:10px;min-height:48px;border-radius:14px;border:1px solid var(--field-line);background:var(--surface);padding:0 14px;color:var(--muted)}
+.search input{flex:1;min-width:0;border:none;background:transparent;outline:none;min-height:46px;color:var(--ink)}
+.row{display:flex;align-items:center;gap:12px;width:100%;padding:12px 0;border:none;border-bottom:1px solid var(--line);background:transparent;text-align:left;min-height:64px}
+.row:last-child{border-bottom:none}
+.row .grow{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.row .grow b{font-weight:700;overflow-wrap:anywhere}
+.row .end{text-align:right;display:flex;flex-direction:column;gap:2px;align-items:flex-end}
+.row .end b{font-weight:800}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.tag.bad{background:var(--bad-bg);color:var(--bad)}
+.tag.warn{background:var(--warn-bg);color:var(--warn)}
+.tag.good{background:var(--good-bg);color:var(--good)}
+.grade{flex:none;width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800}
+.gA{background:var(--gA-bg);color:var(--gA-fg)}.gB{background:var(--gB-bg);color:var(--gB-fg)}.gC{background:var(--gC-bg);color:var(--gC-fg)}
+.gD{background:var(--gD-bg);color:var(--gD-fg)}.gE{background:var(--gE-bg);color:var(--gE-fg)}
+.stockn{font-size:22px;font-weight:800}
+.banner{display:flex;align-items:center;gap:12px;background:var(--warn-bg);color:var(--warn);border-radius:16px;padding:12px 14px;font-size:13px}
+.banner span{flex:1}
+.banner button{flex:none;min-height:44px;padding:0 12px;border-radius:12px;border:1px solid currentColor;background:transparent;font-weight:700;color:inherit}
+.okbox{background:var(--good-bg);color:var(--good);border-radius:16px;padding:12px 14px;font-size:14px;display:flex;gap:10px;align-items:flex-start}
+.okbox span{flex:1}
+.empty{padding:22px 8px;text-align:center;color:var(--muted);font-size:14px}
+.field{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--muted)}
+.field input,.field select,.field textarea{width:100%;min-height:48px;border-radius:14px;border:1px solid var(--field-line);background:var(--surface);padding:0 14px;font-size:16px;color:var(--ink)}
+.field textarea{padding:12px 14px;min-height:96px;resize:vertical}
+.field small{font-weight:500}
+.form{display:flex;flex-direction:column;gap:12px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px}
+.facts div small{display:block}
+.facts div b{display:block;margin-top:2px;overflow-wrap:anywhere}
+.sum{display:flex;flex-direction:column;gap:10px}
+.sum .l{display:flex;justify-content:space-between;gap:12px;font-size:14px}
+.sum .l span:first-child{color:var(--muted)}
+.sum .total{border-top:1px solid var(--line);padding-top:12px;display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.sum .total b{font-size:28px;font-weight:800;color:var(--accent)}
+.sum .total b.out{color:var(--warn)}
+.steps{display:flex;flex-direction:column;gap:8px;font-size:13px;line-height:1.4}
+.steps div{display:flex;gap:10px;align-items:flex-start}
+.steps svg{flex:none;margin-top:1px;color:var(--good)}
+.err{background:var(--bad-bg);color:var(--bad);border-radius:12px;padding:10px 12px;font-size:14px;font-weight:600}
+.scrim{position:fixed;inset:0;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center;z-index:30}
+.panel{width:100%;max-width:480px;max-height:92%;overflow-y:auto;background:var(--surface);color:var(--ink);border-radius:24px 24px 0 0;padding:16px 16px calc(24px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px;outline:none}
+.panel .head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.panel h2{font-size:20px;font-weight:800;overflow-wrap:anywhere}
+.divider{border:none;border-top:1px solid var(--line);margin:2px 0;width:100%}
+.nav{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);z-index:20;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px))}
+.nav .in{max-width:480px;margin-inline:auto;display:flex;justify-content:space-around;align-items:flex-start}
+.nav button{width:64px;min-height:56px;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--muted)}
+.nav button[aria-current="page"]{color:var(--accent);font-weight:700}
+.nav .mid{margin-top:-26px}
+.nav .mid .disc{width:56px;height:56px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(14,124,102,.35)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(100px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;font-size:14px;font-weight:600;z-index:40;max-width:calc(100% - 32px);text-align:center}
+@media (prefers-reduced-motion: no-preference){.panel{animation:rise .18s ease-out}@keyframes rise{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}}
+
+#installBtn{position:fixed;right:16px;bottom:calc(100px + env(safe-area-inset-bottom,0px));z-index:25;box-shadow:0 6px 16px rgba(0,0,0,.25)}
+</style>
+
+<div id="app"></div>
+<div id="sheetRoot"></div>
+<nav class="nav" aria-label="Main"><div class="in" id="navIn"></div></nav>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function(){
+'use strict';
+var KEY='shop-stock.v1', DAY=86400000;
+var CATS=['Phones','TVs','Computers','Audio','Accessories','Appliances','Networking','Gaming','Wearables','Cameras','Power'];
+var PART_TYPES=['Motherboard','Screen','Battery','Speaker','Camera','Charging port','Back cover','Flex cable','Buttons','Power board','T-con board','Backlight strip','Remote','Other'];
+var GRADES={A:'Like new',B:'Good, minor wear',C:'Works, visible wear',D:'Faulty, repairable',E:'Parts only'};
+var METHODS=['Cash','Telebirr','Bank'];
+var storageOK=true;
+
+/* ---------- helpers ---------- */
+var uid=function(){return Math.random().toString(36).slice(2,10);};
+var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
+var fmt=function(n){return Math.round(Number(n)||0).toLocaleString('en-US');};
+var num=function(v){var n=parseFloat(String(v==null?'':v).replace(/,/g,''));return isFinite(n)&&n>0?n:0;};
+var daysSince=function(ts){return Math.floor((Date.now()-ts)/DAY);};
+var isToday=function(ts){return new Date(ts).toDateString()===new Date().toDateString();};
+var $=function(s){return document.querySelector(s);};
+var ic=function(d,s,w){s=s||24;w=w||1.8;return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+w+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';};
+var I={
+  home:'<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+  box:'<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/>',
+  swap:'<path d="M7 4L3 8l4 4"/><path d="M3 8h14"/><path d="M17 20l4-4-4-4"/><path d="M21 16H7"/>',
+  phone:'<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
+  chip:'<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+  x:'<path d="M6 6l12 12M18 6L6 18"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+  check:'<path d="M5 13l4 4L19 7"/>'
+};
+
+/* ---------- data ---------- */
+function emptyDb(){return {v:1,shop:'',demo:false,items:[],used:[],parts:[],sales:[]};}
+function seed(){
+  var t=Date.now(), ago=function(d){return t-d*DAY;}, mins=function(m){return t-m*60000;};
+  var sn=function(n,off){var a=[];for(var i=0;i<n;i++)a.push('35693803'+String(5643800+off+i*173));return a;};
+  var mark=function(a){return a.map(function(x){x.demo=true;return x;});};
+  return {v:1,shop:'',demo:true,
+    items:mark([
+      {id:'i1',name:'Samsung 55" TV',cat:'TVs',track:'serial',price:31500,cost:26000,reorder:3,serials:['TV55-7781','TV55-7782'],qty:0},
+      {id:'i2',name:'iPhone 15 128GB',cat:'Phones',track:'serial',price:78000,cost:70500,reorder:2,serials:sn(6,0),qty:0},
+      {id:'i3',name:'Phone charger 20W',cat:'Accessories',track:'qty',price:650,cost:400,reorder:10,serials:[],qty:4},
+      {id:'i4',name:'JBL Flip 6',cat:'Audio',track:'serial',price:9800,cost:8200,reorder:2,serials:sn(3,900),qty:0},
+      {id:'i5',name:'HDMI cable 2m',cat:'Accessories',track:'qty',price:250,cost:120,reorder:10,serials:[],qty:38}
+    ]),
+    used:mark([
+      {id:'u1',name:'iPhone 13 128GB',imei:'356938035211204',grade:'A',buy:38000,ask:46000,notes:'Battery health 91%',status:'stock',ts:ago(12),source:'trade-in'},
+      {id:'u2',name:'Samsung A54',imei:'356938035300937',grade:'B',buy:14000,ask:18500,notes:'Small scratch on screen',status:'stock',ts:ago(21),source:'trade-in'},
+      {id:'u3',name:'Tecno Spark 10',imei:'356938035115560',grade:'C',buy:4500,ask:6500,notes:'Back cover cracked',status:'stock',ts:ago(45),source:'purchase'},
+      {id:'u4',name:'LG 43" TV',imei:'',grade:'D',buy:5000,ask:9000,notes:'Panel fault, lines on the left',status:'stock',ts:ago(30),source:'purchase'},
+      {id:'u5',name:'Redmi 9',imei:'356938035402217',grade:'E',buy:1200,ask:0,notes:'Dead, keep for parts',status:'stock',ts:ago(60),source:'purchase'},
+      {id:'u6',name:'Infinix Hot 11',imei:'356938035998811',grade:'E',buy:3000,ask:0,notes:'Taken apart',status:'parts',ts:ago(9),partedAt:ago(3),source:'purchase'}
+    ]),
+    parts:mark([
+      {id:'p1',name:'Motherboard',state:'tested',cost:1400,from:'Infinix Hot 11',fromId:'u6',status:'stock',ts:ago(3)},
+      {id:'p2',name:'Screen',state:'tested',cost:1000,from:'Infinix Hot 11',fromId:'u6',status:'stock',ts:ago(3)},
+      {id:'p3',name:'Speaker',state:'untested',cost:200,from:'Infinix Hot 11',fromId:'u6',status:'stock',ts:ago(3)},
+      {id:'p4',name:'Battery',state:'faulty',cost:400,from:'Infinix Hot 11',fromId:'u6',status:'stock',ts:ago(3)},
+      {id:'p5',name:'Power board',state:'tested',cost:900,from:'Bought directly',fromId:'',status:'stock',ts:ago(14)}
+    ]),
+    sales:mark([
+      {id:'s1',ts:mins(95),kind:'new',title:'Phone charger 20W x2',price:1300,cash:1300,profit:500,method:'Cash'},
+      {id:'s2',ts:mins(55),kind:'new',title:'JBL Flip 6',price:9800,cash:9800,profit:1600,method:'Telebirr'},
+      {id:'s3',ts:mins(20),kind:'trade',title:'Samsung 55" TV for LG 32" TV',price:31500,cash:27500,value:4000,profit:5500,method:'Cash'},
+      {id:'s4',ts:ago(1),kind:'used',title:'Samsung A32 (used)',price:12000,cash:12000,profit:3500,method:'Cash'}
+    ])
+  };
+}
+function load(){
+  try{var s=localStorage.getItem(KEY);if(s){var o=JSON.parse(s);if(o&&Array.isArray(o.items)&&Array.isArray(o.used)&&Array.isArray(o.parts)&&Array.isArray(o.sales))return o;}}catch(e){storageOK=false;}
+  return null;
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db));}catch(e){storageOK=false;}}
+var db=load()||seed();
+function freshTrade(m){return {customer:'',name:'',imei:'',grade:'B',value:'',ask:'',itemId:'',serial:'',price:'',method:m||'Cash'};}
+var state={tab:'home',q:'',newCat:'All',usedGrade:'All',usedStatus:'stock',partCat:'All',partStatus:'stock',sheet:null,fresh:false,armed:null,trade:freshTrade(),tradeDone:null,apart:null};
+
+var find=function(arr,id){for(var i=0;i<arr.length;i++)if(arr[i].id===id)return arr[i];return null;};
+var stock=function(i){return i.track==='serial'?i.serials.length:i.qty;};
+var tag=function(t,k){return '<span class="tag '+k+'">'+esc(t)+'</span>';};
+var cap=function(s){return s.charAt(0).toUpperCase()+s.slice(1);};
+function serialInUse(s){
+  s=s.toLowerCase();
+  return db.items.some(function(i){return i.serials.some(function(x){return x.toLowerCase()===s;});})||
+         db.used.some(function(u){return u.status==='stock'&&u.imei&&u.imei.toLowerCase()===s;});
+}
+function whenLabel(ts){var d=daysSince(ts);if(isToday(ts))return new Date(ts).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});return d<=1?'Yesterday':d+' days ago';}
+function toast(msg){var t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(function(){t.hidden=true;},2600);}
+
+/* ---------- views ---------- */
+function topbar(title,sub,right){return '<header class="top"><div><h1>'+title+'</h1>'+(sub?'<p class="sub">'+sub+'</p>':'')+'</div>'+(right||'')+'</header>';}
+function addBtn(action,label){return '<button class="iconbtn primary" data-a="'+action+'" aria-label="'+label+'">'+ic(I.plus,22,2.2)+'</button>';}
+function chipsRow(opts,cur,action){return '<div class="chips" role="group">'+opts.map(function(o){return '<button class="chip" data-a="'+action+'" data-v="'+esc(o.v)+'" aria-pressed="'+(cur===o.v)+'">'+esc(o.t)+'</button>';}).join('')+'</div>';}
+
+function viewHome(){
+  var todays=db.sales.filter(function(s){return isToday(s.ts);});
+  var sum=function(k){return todays.reduce(function(a,s){return a+(s[k]||0);},0);};
+  var trades=todays.filter(function(s){return s.kind==='trade';}).length;
+  var low=db.items.filter(function(i){return stock(i)<=i.reorder;});
+  var usedIn=db.used.filter(function(u){return u.status==='stock';});
+  var partsIn=db.parts.filter(function(p){return p.status==='stock';});
+  var slow=usedIn.filter(function(u){return daysSince(u.ts)>=30&&u.grade!=='E';});
+  var att=[];
+  low.forEach(function(i){att.push('<button class="row" data-a="item" data-id="'+i.id+'"><span class="grow"><b>'+esc(i.name)+'</b><small>'+stock(i)+' left, reorder at '+i.reorder+'</small></span>'+tag(stock(i)===0?'Out of stock':'Low stock','bad')+'</button>');});
+  slow.forEach(function(u){att.push('<button class="row" data-a="used" data-id="'+u.id+'"><span class="grow"><b>Used: '+esc(u.name)+'</b><small>Unsold for '+daysSince(u.ts)+' days</small></span>'+tag('Slow','warn')+'</button>');});
+  var recent=db.sales.slice().sort(function(a,b){return b.ts-a.ts;}).slice(0,5);
+  var today=new Date().toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+  return '<header class="top"><div><p class="sub" style="margin:0 0 2px">'+esc(today)+'</p><h1>'+esc(db.shop||'Your shop')+'</h1></div><button class="iconbtn" data-a="settings" aria-label="Settings and backup">'+ic(I.gear,22)+'</button></header>'+
+  (db.demo?'<div class="banner"><span>You are looking at example data. Remove it before you start with your real stock.</span><button data-a="clearDemo">Remove</button></div>':'')+
+  (!storageOK?'<div class="banner"><span>This browser is not saving data. Your changes will be lost when you close the page.</span></div>':'')+
+  '<section class="hero"><div><div class="label">Today\'s sales</div><div class="big num">'+fmt(sum('price'))+'<span>Birr</span></div></div>'+
+  '<div class="stats"><div><div class="label">Profit</div><b class="num">'+fmt(sum('profit'))+'</b></div><div><div class="label">Sales</div><b class="num">'+todays.length+'</b></div><div><div class="label">Trade-ins</div><b class="num">'+trades+'</b></div></div></section>'+
+  '<section class="tiles"><button class="tile" data-a="goLow"><b class="num" style="color:'+(low.length?'var(--bad)':'var(--ink)')+'">'+low.length+'</b><span>Low stock</span></button>'+
+  '<button class="tile" data-a="tab" data-v="used"><b class="num">'+usedIn.length+'</b><span>Used units</span></button>'+
+  '<button class="tile" data-a="tab" data-v="parts"><b class="num">'+partsIn.length+'</b><span>Spare parts</span></button></section>'+
+  '<div class="btns"><button class="btn primary" data-a="goSell">'+ic(I.plus,18,2.2)+'New sale</button><button class="btn" data-a="itemNew">Add item</button></div>'+
+  '<section class="card"><h3>Needs attention</h3>'+(att.length?'<div style="margin-inline:-0px">'+att.slice(0,6).join('')+'</div>':'<p class="empty" style="padding-block:10px">Nothing needs attention right now.</p>')+'</section>'+
+  '<section class="card"><h3>Recent sales</h3>'+(recent.length?recent.map(function(s){return '<div class="row" style="min-height:56px"><span class="grow"><b>'+esc(s.title)+'</b><small>'+esc(whenLabel(s.ts))+' · '+esc(s.method||'')+(s.kind==='trade'?' · trade-in':'')+'</small></span><span class="end"><b class="num">'+fmt(s.price)+'</b><small class="num">profit '+fmt(s.profit)+'</small></span></div>';}).join(''):'<p class="empty" style="padding-block:10px">No sales yet. Record your first sale from the New tab.</p>')+'</section>';
+}
+
+function newList(){
+  var q=state.q.trim().toLowerCase();
+  var list=db.items.filter(function(i){
+    if(state.newCat==='Low'&&stock(i)>i.reorder)return false;
+    if(state.newCat!=='All'&&state.newCat!=='Low'&&i.cat!==state.newCat)return false;
+    if(q&&(i.name+' '+i.cat+' '+i.serials.join(' ')).toLowerCase().indexOf(q)<0)return false;
+    return true;
+  });
+  if(!list.length)return '<p class="empty">'+(db.items.length?'No items match. Try a different search or filter.':'No items yet. Tap + to add your first item.')+'</p>';
+  return list.map(function(i){
+    var s=stock(i),isLow=s<=i.reorder;
+    return '<button class="row" data-a="item" data-id="'+i.id+'"><span class="grow"><b>'+esc(i.name)+'</b><small>'+esc(i.cat)+', '+(i.track==='serial'?'tracked by IMEI or serial':'counted by quantity')+'</small><span class="num" style="font-weight:600;font-size:14px;margin-top:4px">'+fmt(i.price)+' Birr</span></span><span class="end"><span class="stockn num" style="color:'+(isLow?'var(--bad)':'var(--ink)')+'">'+s+'</span>'+tag(s===0?'Out':isLow?'Low':'OK',isLow?'bad':'good')+'</span></button>';
+  }).join('');
+}
+function viewNew(){
+  var cats=[];db.items.forEach(function(i){if(cats.indexOf(i.cat)<0)cats.push(i.cat);});
+  var lowN=db.items.filter(function(i){return stock(i)<=i.reorder;}).length;
+  var opts=[{v:'All',t:'All'},{v:'Low',t:'Low stock ('+lowN+')'}].concat(cats.map(function(c){return {v:c,t:c};}));
+  return topbar('New items',db.items.length+' products, '+lowN+' low on stock',addBtn('itemNew','Add item'))+
+  '<label class="search">'+ic(I.search,20)+'<input id="q" type="search" placeholder="Search name or IMEI" aria-label="Search items" value="'+esc(state.q)+'" data-live="newList"></label>'+
+  chipsRow(opts,state.newCat,'setNewCat')+
+  '<section class="card flush" id="newList">'+newList()+'</section>';
+}
+
+function usedRow(u){
+  var d=daysSince(u.ts);
+  var right=u.status==='sold'?'<b class="num">'+fmt(u.soldPrice)+'</b><small>Sold</small>':u.status==='parts'?'<b>Parts</b><small>Taken apart</small>':'<b class="num">'+(u.ask?fmt(u.ask):'Parts')+'</b><small class="num">Bought '+fmt(u.buy)+'</small>';
+  return '<button class="row" data-a="used" data-id="'+u.id+'"><span class="grade g'+u.grade+'">'+u.grade+'</span><span class="grow"><b>'+esc(u.name)+'</b><small>'+(u.imei?'IMEI …'+esc(u.imei.slice(-4)):'No IMEI')+', '+(d===0?'today':d+' days')+'</small></span><span class="end">'+right+'</span></button>';
+}
+function viewUsed(){
+  var inStock=db.used.filter(function(u){return u.status==='stock';});
+  var tied=inStock.reduce(function(a,u){return a+u.buy;},0);
+  var slowN=inStock.filter(function(u){return daysSince(u.ts)>=30;}).length;
+  var list=db.used.filter(function(u){return u.status===state.usedStatus&&(state.usedGrade==='All'||u.grade===state.usedGrade);}).sort(function(a,b){return b.ts-a.ts;});
+  var gradeOpts=[{v:'All',t:'All'}].concat(Object.keys(GRADES).map(function(g){return {v:g,t:g};}));
+  return topbar('Used devices',inStock.length+' units in stock, graded A to E',addBtn('usedNew','Add used device'))+
+  '<section class="tiles2"><div class="tile"><span>Money tied up</span><b class="num" style="font-size:20px;margin-top:4px">'+fmt(tied)+'</b></div><div class="tile"><span>Unsold 30+ days</span><b class="num" style="font-size:20px;margin-top:4px;color:'+(slowN?'var(--warn)':'var(--ink)')+'">'+slowN+' units</b></div></section>'+
+  '<div class="seg" role="group"><button data-a="setUsedStatus" data-v="stock" aria-pressed="'+(state.usedStatus==='stock')+'">In stock</button><button data-a="setUsedStatus" data-v="sold" aria-pressed="'+(state.usedStatus==='sold')+'">Sold</button><button data-a="setUsedStatus" data-v="parts" aria-pressed="'+(state.usedStatus==='parts')+'">Taken apart</button></div>'+
+  chipsRow(gradeOpts,state.usedGrade,'setUsedGrade')+
+  '<section class="card flush">'+(list.length?list.map(usedRow).join(''):'<p class="empty">Nothing here yet.</p>')+'</section>';
+}
+
+function partRow(p){
+  var k=p.state==='tested'?'good':p.state==='faulty'?'bad':'warn';
+  return '<button class="row" data-a="part" data-id="'+p.id+'"><span class="grow"><b>'+esc(p.name)+'</b><small>From '+esc(p.from||'unknown')+'</small></span><span class="end"><b class="num">'+fmt(p.cost)+'</b>'+tag(cap(p.state),k)+'</span></button>';
+}
+function viewParts(){
+  var inStock=db.parts.filter(function(p){return p.status==='stock';});
+  var cats=[];db.parts.forEach(function(p){if(cats.indexOf(p.name)<0)cats.push(p.name);});
+  var list=db.parts.filter(function(p){return p.status===state.partStatus&&(state.partCat==='All'||p.name===state.partCat);}).sort(function(a,b){return b.ts-a.ts;});
+  return topbar('Spare parts',inStock.length+' parts in stock',addBtn('partNew','Add part'))+
+  '<section class="hero" style="gap:10px"><div><div style="font-size:16px;font-weight:700">Take a device apart</div><div class="label" style="margin-top:4px;line-height:1.4">Pick a used device, list the parts you got, and the app splits its buy-in cost across them.</div></div><button class="btn wide" data-a="apartOpen">Start</button></section>'+
+  '<div class="seg" role="group"><button data-a="setPartStatus" data-v="stock" aria-pressed="'+(state.partStatus==='stock')+'">In stock</button><button data-a="setPartStatus" data-v="used" aria-pressed="'+(state.partStatus==='used')+'">Used in repairs</button></div>'+
+  chipsRow([{v:'All',t:'All'}].concat(cats.map(function(c){return {v:c,t:c};})),state.partCat,'setPartCat')+
+  '<section class="card flush">'+(list.length?list.map(partRow).join(''):'<p class="empty">No parts here yet.</p>')+'</section>';
+}
+
+/* trade-in */
+function tradeCalc(){
+  var t=state.trade,it=find(db.items,t.itemId),price=num(t.price),value=num(t.value),miss=[];
+  if(!t.name.trim())miss.push('the customer\'s device');
+  if(!it)miss.push('the new device');
+  else if(it.track==='serial'&&!t.serial)miss.push('which unit they take');
+  if(!value)miss.push('the trade-in value');
+  if(!price&&it)miss.push('the selling price');
+  return {it:it,price:price,value:value,diff:price-value,miss:miss};
+}
+function tradeSummary(){
+  var c=tradeCalc(),t=state.trade,out=c.diff<0;
+  return '<div class="sum"><div class="l"><span>New device</span><span class="num">'+fmt(c.price)+'</span></div><div class="l"><span>Trade-in value</span><span class="num">- '+fmt(c.value)+'</span></div>'+
+  '<div class="total"><span style="font-weight:700">'+(out?'You pay the customer':'Customer pays')+'</span><b class="num'+(out?' out':'')+'">'+fmt(Math.abs(c.diff))+' <small style="font-size:14px;font-weight:600">Birr</small></b></div></div>'+
+  '<div class="steps" style="margin-top:12px"><small style="font-weight:700;color:var(--ink)">When you confirm, the app will:</small>'+
+  '<div>'+ic(I.check,18,2.4)+'<span>Remove '+esc(c.it?c.it.name:'the new device')+' from new stock</span></div>'+
+  '<div>'+ic(I.check,18,2.4)+'<span>Add '+esc(t.name.trim()||'the old device')+' to used stock at a cost of '+fmt(c.value)+'</span></div>'+
+  '<div>'+ic(I.check,18,2.4)+'<span>Record '+fmt(Math.abs(c.diff))+' Birr '+(out?'paid out':'received')+' by '+esc(t.method.toLowerCase())+'</span></div></div>'+
+  (c.miss.length?'<p class="sub" style="margin-top:10px">Still needed: '+esc(c.miss.join(', '))+'.</p>':'');
+}
+function viewTrade(){
+  var t=state.trade,c=tradeCalc();
+  var avail=db.items.filter(function(i){return stock(i)>0;});
+  var itemOpts='<option value="">Choose a new device</option>'+avail.map(function(i){return '<option value="'+i.id+'"'+(i.id===t.itemId?' selected':'')+'>'+esc(i.name)+' ('+stock(i)+' left)</option>';}).join('');
+  var serialField='';
+  if(c.it&&c.it.track==='serial'){
+    serialField='<label class="field" for="t_serial">Which unit<select id="t_serial" data-bind="trade.serial"><option value="">Choose IMEI or serial</option>'+c.it.serials.map(function(s){return '<option'+(s===t.serial?' selected':'')+'>'+esc(s)+'</option>';}).join('')+'</select></label>';
+  }
+  return topbar('Trade-in','Old device in, new device out')+
+  (state.tradeDone?'<div class="okbox">'+ic(I.check,20,2.4)+'<span>'+esc(state.tradeDone)+'</span></div>':'')+
+  '<section class="card form"><h3 style="margin:0">Customer brings</h3>'+
+  '<label class="field" for="t_name">Device<input id="t_name" data-bind="trade.name" data-live="trade" value="'+esc(t.name)+'" placeholder="For example Samsung A54" autocomplete="off"></label>'+
+  '<label class="field" for="t_imei">IMEI or serial<input id="t_imei" data-bind="trade.imei" value="'+esc(t.imei)+'" inputmode="numeric" autocomplete="off"></label>'+
+  '<div><div class="field" style="margin-bottom:6px">Condition</div><div class="chips" role="group" aria-label="Condition grade">'+Object.keys(GRADES).map(function(g){return '<button class="chip" data-a="tradeGrade" data-v="'+g+'" aria-pressed="'+(t.grade===g)+'">'+g+'</button>';}).join('')+'</div><small>'+esc(t.grade)+': '+esc(GRADES[t.grade])+'</small></div>'+
+  '<div class="grid2"><label class="field" for="t_value">Agreed value (Birr)<input id="t_value" data-bind="trade.value" data-live="trade" value="'+esc(t.value)+'" inputmode="numeric" autocomplete="off"></label>'+
+  '<label class="field" for="t_ask">Resale price<input id="t_ask" data-bind="trade.ask" value="'+esc(t.ask)+'" inputmode="numeric" autocomplete="off"></label></div>'+
+  '<label class="field" for="t_cust">Customer name or phone (optional)<input id="t_cust" data-bind="trade.customer" value="'+esc(t.customer)+'" autocomplete="off"></label></section>'+
+  '<section class="card form"><h3 style="margin:0">Customer takes</h3>'+
+  '<label class="field" for="t_item">New device<select id="t_item" data-bind="trade.itemId">'+itemOpts+'</select></label>'+serialField+
+  '<label class="field" for="t_price">Selling price (Birr)<input id="t_price" data-bind="trade.price" data-live="trade" value="'+esc(t.price)+'" inputmode="numeric" autocomplete="off"></label></section>'+
+  '<section class="card"><div id="tradeSummary">'+tradeSummary()+'</div></section>'+
+  '<div><div class="field" style="margin-bottom:6px">Paid by</div><div class="seg" role="group">'+METHODS.map(function(m){return '<button data-a="tradeMethod" data-v="'+m+'" aria-pressed="'+(t.method===m)+'">'+m+'</button>';}).join('')+'</div></div>'+
+  '<button class="btn primary wide" id="tradeGo" data-a="tradeGo"'+(c.miss.length?' disabled':'')+'>Confirm trade-in</button>';
+}
+
+function render(){
+  var v=state.tab==='home'?viewHome():state.tab==='new'?viewNew():state.tab==='trade'?viewTrade():state.tab==='used'?viewUsed():viewParts();
+  $('#app').innerHTML=v;
+  renderNav();renderSheet();
+}
+function renderNav(){
+  var tabs=[['home','Home','home'],['new','New','box'],['trade','Trade-in','swap'],['used','Used','phone'],['parts','Parts','chip']];
+  $('#navIn').innerHTML=tabs.map(function(t){
+    var cur=state.tab===t[0]?' aria-current="page"':'';
+    if(t[0]==='trade')return '<button class="mid" data-a="tab" data-v="trade"'+cur+'><span class="disc">'+ic(I[t[2]],26,1.9)+'</span>'+t[1]+'</button>';
+    return '<button data-a="tab" data-v="'+t[0]+'"'+cur+'>'+ic(I[t[2]],24)+t[1]+'</button>';
+  }).join('');
+}
+
+/* ---------- sheets ---------- */
+function sheetHead(title,sub){return '<div class="head"><div><h2>'+esc(title)+'</h2>'+(sub?'<p class="sub">'+esc(sub)+'</p>':'')+'</div><button class="iconbtn" data-a="close" aria-label="Close">'+ic(I.x,20,2)+'</button></div>';}
+function methodSelect(id){return '<label class="field" for="'+id+'">Paid by<select id="'+id+'">'+METHODS.map(function(m){return '<option>'+m+'</option>';}).join('')+'</select></label>';}
+function errBox(){return '<p class="err" id="sheetErr" role="alert" hidden></p>';}
+function formErr(msg){var e=$('#sheetErr');if(e){e.textContent=msg;e.hidden=false;e.scrollIntoView({block:'nearest'});}}
+function catList(){var all=CATS.slice();db.items.forEach(function(i){if(all.indexOf(i.cat)<0)all.push(i.cat);});return '<datalist id="catlist">'+all.map(function(c){return '<option value="'+esc(c)+'">';}).join('')+'</datalist>';}
+function partList(){return '<datalist id="partlist">'+PART_TYPES.map(function(c){return '<option value="'+esc(c)+'">';}).join('')+'</datalist>';}
+
+function sheetItem(i){
+  var s=stock(i),margin=i.price?Math.round((i.price-i.cost)/i.price*100):0;
+  var sell=s===0?'<p class="empty" style="padding:8px">Out of stock. Add stock below.</p>':
+    '<form class="form" data-form="sell" data-id="'+i.id+'"><h3 style="margin:0">Sell</h3>'+
+    (i.track==='serial'?'<label class="field" for="s_serial">Which unit<select id="s_serial">'+i.serials.map(function(x){return '<option>'+esc(x)+'</option>';}).join('')+'</select></label>':'<label class="field" for="s_qty">Quantity<input id="s_qty" inputmode="numeric" value="1" autocomplete="off"></label>')+
+    '<div class="grid2"><label class="field" for="s_price">Price each (Birr)<input id="s_price" inputmode="numeric" value="'+i.price+'" autocomplete="off"></label>'+methodSelect('s_method')+'</div>'+errBox()+
+    '<button class="btn primary wide" type="submit">Record sale</button></form>';
+  var restock='<form class="form" data-form="restock" data-id="'+i.id+'"><h3 style="margin:0">Add stock</h3>'+
+    (i.track==='serial'?'<label class="field" for="r_serials">IMEIs or serials<textarea id="r_serials" placeholder="One per line"></textarea><small>Each unit is tracked on its own.</small></label>':'<label class="field" for="r_qty">How many arrived<input id="r_qty" inputmode="numeric" autocomplete="off"></label>')+
+    '<button class="btn wide" type="submit">Add to stock</button></form>';
+  return sheetHead(i.name,i.cat+', '+(i.track==='serial'?'tracked by IMEI or serial':'counted by quantity'))+
+  '<div class="facts"><div><small>In stock</small><b class="num">'+s+'</b></div><div><small>Reorder at</small><b class="num">'+i.reorder+'</b></div><div><small>Price</small><b class="num">'+fmt(i.price)+' Birr</b></div><div><small>Cost / margin</small><b class="num">'+fmt(i.cost)+' / '+margin+'%</b></div></div>'+
+  '<hr class="divider">'+sell+'<hr class="divider">'+restock+'<hr class="divider">'+
+  '<div class="btns"><button class="btn" data-a="itemEdit" data-id="'+i.id+'">Edit</button><button class="btn danger'+(state.armed==='delItem'+i.id?' armed':'')+'" data-a="itemDel" data-id="'+i.id+'">'+(state.armed==='delItem'+i.id?'Tap again to delete':'Delete')+'</button></div>';
+}
+function sheetItemForm(i){
+  var e=!!i;i=i||{name:'',cat:'',track:'qty',price:'',cost:'',reorder:5,qty:'',serials:[]};
+  return sheetHead(e?'Edit item':'Add item')+
+  '<form class="form" data-form="itemSave" data-id="'+(e?i.id:'')+'">'+
+  '<label class="field" for="f_name">Name<input id="f_name" value="'+esc(i.name)+'" autocomplete="off" placeholder="For example Samsung 55&quot; TV"></label>'+
+  '<label class="field" for="f_cat">Category<input id="f_cat" list="catlist" value="'+esc(i.cat)+'" autocomplete="off" placeholder="Pick one or type your own"></label>'+catList()+
+  '<label class="field" for="f_track">How do you track it?<select id="f_track" data-live="itemTrack"'+(e?' disabled':'')+'><option value="qty"'+(i.track==='qty'?' selected':'')+'>By quantity (cables, cases, chargers)</option><option value="serial"'+(i.track==='serial'?' selected':'')+'>By IMEI or serial (phones, TVs, laptops)</option></select></label>'+
+  '<div class="grid2"><label class="field" for="f_price">Selling price<input id="f_price" inputmode="numeric" value="'+esc(i.price)+'" autocomplete="off"></label><label class="field" for="f_cost">Your cost<input id="f_cost" inputmode="numeric" value="'+esc(i.cost)+'" autocomplete="off"></label></div>'+
+  '<label class="field" for="f_reorder">Warn me when stock is at or below<input id="f_reorder" inputmode="numeric" value="'+esc(i.reorder)+'" autocomplete="off"></label>'+
+  (e?'':'<label class="field" id="w_qty" for="f_qty"'+(i.track==='serial'?' hidden':'')+'>Starting stock<input id="f_qty" inputmode="numeric" autocomplete="off"></label><label class="field" id="w_serials" for="f_serials" hidden>IMEIs or serials<textarea id="f_serials" placeholder="One per line"></textarea></label>')+
+  errBox()+'<button class="btn primary wide" type="submit">'+(e?'Save changes':'Add item')+'</button></form>';
+}
+
+function sheetUsed(u){
+  var d=daysSince(u.ts),facts='<div class="facts"><div><small>Condition</small><b>'+u.grade+', '+esc(GRADES[u.grade])+'</b></div><div><small>In stock</small><b>'+(d===0?'Today':d+' days')+'</b></div><div><small>Bought for</small><b class="num">'+fmt(u.buy)+' Birr</b></div><div><small>Asking</small><b class="num">'+(u.ask?fmt(u.ask)+' Birr':'Parts only')+'</b></div><div><small>IMEI or serial</small><b>'+esc(u.imei||'None')+'</b></div><div><small>Came from</small><b>'+(u.source==='trade-in'?'Trade-in':'Bought outright')+'</b></div></div>'+(u.notes?'<p class="sub">'+esc(u.notes)+'</p>':'');
+  var body='';
+  if(u.status==='stock'){
+    body='<hr class="divider"><form class="form" data-form="usedSell" data-id="'+u.id+'"><h3 style="margin:0">Sell</h3><div class="grid2"><label class="field" for="us_price">Price (Birr)<input id="us_price" inputmode="numeric" value="'+(u.ask||'')+'" autocomplete="off"></label>'+methodSelect('us_method')+'</div>'+errBox()+'<button class="btn primary wide" type="submit">Record sale</button></form>'+
+    '<button class="btn wide" data-a="apartFrom" data-id="'+u.id+'">Take it apart for parts</button>';
+  }else if(u.status==='sold'){
+    body='<hr class="divider"><div class="okbox"><span>Sold for '+fmt(u.soldPrice)+' Birr. Profit '+fmt(u.soldPrice-u.buy)+' Birr.</span></div>';
+  }else{
+    var ps=db.parts.filter(function(p){return p.fromId===u.id;});
+    body='<hr class="divider"><h3 style="margin:0;font-size:16px">Parts from this device</h3>'+(ps.length?'<div>'+ps.map(partRow).join('')+'</div>':'<p class="sub">No parts recorded.</p>');
+  }
+  return sheetHead(u.name)+facts+body+'<hr class="divider"><div class="btns"><button class="btn" data-a="usedEdit" data-id="'+u.id+'">Edit</button><button class="btn danger'+(state.armed==='delUsed'+u.id?' armed':'')+'" data-a="usedDel" data-id="'+u.id+'">'+(state.armed==='delUsed'+u.id?'Tap again to delete':'Delete')+'</button></div>';
+}
+function sheetUsedForm(u){
+  var e=!!u;u=u||{name:'',imei:'',grade:'B',buy:'',ask:'',notes:''};
+  return sheetHead(e?'Edit used device':'Add used device',e?'':'Bought outright from a customer or supplier')+
+  '<form class="form" data-form="usedSave" data-id="'+(e?u.id:'')+'">'+
+  '<label class="field" for="g_name">Device<input id="g_name" value="'+esc(u.name)+'" autocomplete="off" placeholder="For example iPhone 13 128GB"></label>'+
+  '<label class="field" for="g_imei">IMEI or serial<input id="g_imei" value="'+esc(u.imei)+'" inputmode="numeric" autocomplete="off"></label>'+
+  '<label class="field" for="g_grade">Condition<select id="g_grade">'+Object.keys(GRADES).map(function(g){return '<option value="'+g+'"'+(u.grade===g?' selected':'')+'>'+g+': '+GRADES[g]+'</option>';}).join('')+'</select></label>'+
+  '<div class="grid2"><label class="field" for="g_buy">Bought for<input id="g_buy" inputmode="numeric" value="'+esc(u.buy)+'" autocomplete="off"></label><label class="field" for="g_ask">Asking price<input id="g_ask" inputmode="numeric" value="'+esc(u.ask||'')+'" autocomplete="off"></label></div>'+
+  '<label class="field" for="g_notes">What is wrong with it?<textarea id="g_notes" placeholder="Scratches, battery health, faults">'+esc(u.notes)+'</textarea></label>'+
+  errBox()+'<button class="btn primary wide" type="submit">'+(e?'Save changes':'Add to used stock')+'</button></form>';
+}
+
+function sheetPart(p){
+  var from=p.fromId?find(db.used,p.fromId):null;
+  return sheetHead(p.name,'From '+(p.from||'unknown'))+
+  '<div class="facts"><div><small>Cost share</small><b class="num">'+fmt(p.cost)+' Birr</b></div><div><small>Status</small><b>'+(p.status==='stock'?'In stock':'Used in a repair')+'</b></div></div>'+
+  '<div><div class="field" style="margin-bottom:6px">Condition</div><div class="seg" role="group">'+['tested','untested','faulty'].map(function(s){return '<button data-a="partState" data-id="'+p.id+'" data-v="'+s+'" aria-pressed="'+(p.state===s)+'">'+cap(s)+'</button>';}).join('')+'</div></div>'+
+  (p.status==='stock'?'<button class="btn primary wide" data-a="partUse" data-id="'+p.id+'">Mark as used in a repair</button>':'<button class="btn wide" data-a="partUse" data-id="'+p.id+'">Put back in stock</button>')+
+  '<button class="btn danger wide'+(state.armed==='delPart'+p.id?' armed':'')+'" data-a="partDel" data-id="'+p.id+'">'+(state.armed==='delPart'+p.id?'Tap again to delete':'Delete part')+'</button>';
+}
+function sheetPartForm(){
+  return sheetHead('Add part','Bought directly or pulled from a device')+
+  '<form class="form" data-form="partSave"><label class="field" for="pp_name">Part<input id="pp_name" list="partlist" autocomplete="off" placeholder="For example Screen"></label>'+partList()+
+  '<div class="grid2"><label class="field" for="pp_cost">Cost<input id="pp_cost" inputmode="numeric" autocomplete="off"></label><label class="field" for="pp_state">Condition<select id="pp_state"><option value="tested">Tested</option><option value="untested" selected>Untested</option><option value="faulty">Faulty</option></select></label></div>'+
+  '<label class="field" for="pp_from">Where from<input id="pp_from" value="Bought directly" autocomplete="off"></label>'+errBox()+'<button class="btn primary wide" type="submit">Add part</button></form>';
+}
+
+function apartCosts(){
+  var a=state.apart,dev=find(db.used,a.deviceId),rows=a.rows.filter(function(r){return r.name.trim();});
+  var tot=rows.reduce(function(s,r){return s+(num(r.share)||1);},0),left=dev?dev.buy:0,out={};
+  rows.forEach(function(r,idx){var c=idx===rows.length-1?left:Math.round((dev?dev.buy:0)*(num(r.share)||1)/tot);left-=c;out[r.key]=c;});
+  return out;
+}
+function sheetApart(){
+  var a=state.apart,devs=db.used.filter(function(u){return u.status==='stock';});
+  if(!devs.length)return sheetHead('Take a device apart')+'<p class="empty">You have no used devices in stock. Add one first.</p>';
+  var costs=apartCosts();
+  return sheetHead('Take a device apart','The device cost is split across the parts you list')+
+  '<label class="field" for="ap_dev">Device<select id="ap_dev">'+devs.map(function(u){return '<option value="'+u.id+'"'+(u.id===a.deviceId?' selected':'')+'>'+esc(u.name)+' (bought '+fmt(u.buy)+')</option>';}).join('')+'</select></label>'+
+  '<div class="form">'+a.rows.map(function(r,idx){
+    return '<div class="card form" style="padding:12px"><div class="grid2"><label class="field" for="ap_n'+idx+'">Part<input id="ap_n'+idx+'" list="partlist" data-row="'+idx+'" data-field="name" value="'+esc(r.name)+'" autocomplete="off"></label>'+
+    '<label class="field" for="ap_s'+idx+'">Condition<select id="ap_s'+idx+'" data-row="'+idx+'" data-field="state">'+['tested','untested','faulty'].map(function(s){return '<option value="'+s+'"'+(r.state===s?' selected':'')+'>'+cap(s)+'</option>';}).join('')+'</select></label></div>'+
+    '<div class="grid2"><label class="field" for="ap_w'+idx+'">Value weight<input id="ap_w'+idx+'" inputmode="numeric" data-row="'+idx+'" data-field="share" value="'+esc(r.share)+'" autocomplete="off"></label><div class="field">Cost share<b class="num" id="ap_c'+idx+'" style="font-size:18px;color:var(--ink);min-height:48px;display:flex;align-items:center">'+(r.name.trim()?fmt(costs[r.key]):'0')+'</b></div></div>'+
+    (a.rows.length>1?'<button class="btn" type="button" data-a="apartRm" data-v="'+idx+'">Remove this part</button>':'')+'</div>';}).join('')+'</div>'+partList()+
+  '<small>A bigger weight gives that part a bigger share of the cost, for example a motherboard counts more than a speaker.</small>'+
+  '<button class="btn wide" data-a="apartAdd">Add another part</button>'+errBox()+'<button class="btn primary wide" data-a="apartGo">Save parts and mark device as taken apart</button>';
+}
+
+function sheetSettings(){
+  var json=JSON.stringify(db);
+  return sheetHead('Settings and backup')+
+  '<label class="field" for="st_shop">Shop name<input id="st_shop" value="'+esc(db.shop)+'" autocomplete="off" placeholder="Your shop"></label>'+
+  '<button class="btn wide" data-a="shopSave">Save name</button><hr class="divider">'+
+  '<h3 style="margin:0">Backup</h3><p class="sub">Your data is saved only in this browser on this phone. Copy the backup text and keep it somewhere safe, for example in Telegram Saved Messages.</p>'+
+  '<label class="field" for="bk_out">Backup text<textarea id="bk_out" readonly>'+esc(json)+'</textarea></label><button class="btn wide" data-a="copyBackup">Copy backup</button><hr class="divider">'+
+  '<h3 style="margin:0">Restore</h3><label class="field" for="bk_in">Paste backup text<textarea id="bk_in" placeholder="Paste here"></textarea></label>'+errBox()+'<button class="btn wide" data-a="restore">Restore from backup</button>'+
+  (db.demo?'<hr class="divider"><button class="btn wide" data-a="clearDemo">Remove example data</button>':'')+
+  '<hr class="divider"><button class="btn danger wide'+(state.armed==='reset'?' armed':'')+'" data-a="resetAll">'+(state.armed==='reset'?'Tap again to erase everything':'Erase everything and start empty')+'</button>';
+}
+
+function renderSheet(){
+  var root=$('#sheetRoot'),s=state.sheet;
+  if(!s){root.innerHTML='';return;}
+  var h='';
+  if(s.t==='item'){var i=find(db.items,s.id);h=i?sheetItem(i):'';}
+  else if(s.t==='itemForm')h=sheetItemForm(s.id?find(db.items,s.id):null);
+  else if(s.t==='used'){var u=find(db.used,s.id);h=u?sheetUsed(u):'';}
+  else if(s.t==='usedForm')h=sheetUsedForm(s.id?find(db.used,s.id):null);
+  else if(s.t==='part'){var p=find(db.parts,s.id);h=p?sheetPart(p):'';}
+  else if(s.t==='partForm')h=sheetPartForm();
+  else if(s.t==='apart')h=sheetApart();
+  else if(s.t==='settings')h=sheetSettings();
+  if(!h){state.sheet=null;root.innerHTML='';return;}
+  root.innerHTML='<div class="scrim" data-a="overlay"><div class="panel" role="dialog" aria-modal="true" aria-label="Details" tabindex="-1">'+h+'</div></div>';
+  if(state.fresh){state.fresh=false;var pn=root.querySelector('.panel');if(pn)pn.focus();}
+}
+function openSheet(s){state.sheet=s;state.fresh=true;state.armed=null;render();}
+function closeSheet(){state.sheet=null;state.armed=null;render();}
+function arm(key,fn){
+  if(state.armed===key){state.armed=null;fn();return;}
+  state.armed=key;render();clearTimeout(arm.h);arm.h=setTimeout(function(){if(state.armed===key){state.armed=null;render();}},4000);
+}
+
+/* ---------- actions ---------- */
+function go(tab){state.tab=tab;state.sheet=null;state.armed=null;if(tab!=='trade')state.tradeDone=null;render();window.scrollTo(0,0);}
+function parseSerials(txt){var seen={},out=[];String(txt||'').split(/[\n,;]+/).forEach(function(x){x=x.trim();if(x&&!seen[x.toLowerCase()]){seen[x.toLowerCase()]=1;out.push(x);}});return out;}
+function val(id){var e=$('#'+id);return e?e.value.trim():'';}
+
+var forms={
+  itemSave:function(id){
+    var name=val('f_name'),cat=val('f_cat'),price=num(val('f_price')),cost=num(val('f_cost')),reorder=Math.floor(num(val('f_reorder')));
+    if(!name)return formErr('Enter the item name.');
+    if(!cat)return formErr('Pick a category or type a new one.');
+    if(!price)return formErr('Enter the selling price.');
+    if(id){var it=find(db.items,id);it.name=name;it.cat=cat;it.price=price;it.cost=cost;it.reorder=reorder;save();toast('Item saved');openSheet({t:'item',id:id});return;}
+    var track=val('f_track'),it2={id:uid(),name:name,cat:cat,track:track,price:price,cost:cost,reorder:reorder,serials:[],qty:0};
+    if(track==='serial'){
+      var list=parseSerials(val('f_serials')),dup=list.filter(serialInUse);
+      if(dup.length)return formErr('Already in your stock: '+dup.join(', '));
+      it2.serials=list;
+    }else it2.qty=Math.floor(num(val('f_qty')));
+    db.items.push(it2);save();state.sheet=null;state.newCat='All';state.q='';toast('Item added');go('new');
+  },
+  sell:function(id){
+    var it=find(db.items,id),price=num(val('s_price')),method=val('s_method'),q=1,serial='';
+    if(!price)return formErr('Enter the selling price.');
+    if(it.track==='serial'){serial=val('s_serial');var ix=it.serials.indexOf(serial);if(ix<0)return formErr('Choose a unit to sell.');it.serials.splice(ix,1);}
+    else{q=Math.floor(num(val('s_qty')));if(q<1)return formErr('Enter how many you are selling.');if(q>it.qty)return formErr('Only '+it.qty+' in stock.');it.qty-=q;}
+    db.sales.push({id:uid(),ts:Date.now(),kind:'new',title:it.name+(q>1?' x'+q:'')+(serial?' ('+serial.slice(-4)+')':''),price:price*q,cash:price*q,profit:(price-it.cost)*q,method:method,itemId:it.id});
+    save();toast('Sale recorded: '+fmt(price*q)+' Birr'+(price<it.cost?' (below cost)':''));
+    state.sheet=null;render();
+  },
+  restock:function(id){
+    var it=find(db.items,id);
+    if(it.track==='serial'){
+      var list=parseSerials(val('r_serials'));if(!list.length)return toast('Enter at least one IMEI or serial');
+      var dup=list.filter(serialInUse);if(dup.length)return toast('Already in stock: '+dup.join(', '));
+      it.serials=it.serials.concat(list);toast(list.length+' units added');
+    }else{var q=Math.floor(num(val('r_qty')));if(q<1)return toast('Enter how many arrived');it.qty+=q;toast(q+' added to stock');}
+    save();openSheet({t:'item',id:id});
+  },
+  usedSave:function(id){
+    var name=val('g_name'),imei=val('g_imei'),grade=val('g_grade'),buy=num(val('g_buy')),ask=num(val('g_ask')),notes=val('g_notes');
+    if(!name)return formErr('Enter the device name.');
+    if(!buy)return formErr('Enter what you paid for it.');
+    if(imei){var clash=db.used.some(function(u){return u.id!==id&&u.status==='stock'&&u.imei&&u.imei.toLowerCase()===imei.toLowerCase();})||db.items.some(function(i){return i.serials.some(function(x){return x.toLowerCase()===imei.toLowerCase();});});if(clash)return formErr('That IMEI or serial is already in your stock.');}
+    if(id){var u=find(db.used,id);u.name=name;u.imei=imei;u.grade=grade;u.buy=buy;u.ask=ask;u.notes=notes;save();toast('Saved');openSheet({t:'used',id:id});return;}
+    db.used.push({id:uid(),name:name,imei:imei,grade:grade,buy:buy,ask:ask,notes:notes,status:'stock',ts:Date.now(),source:'purchase'});
+    save();state.sheet=null;state.usedStatus='stock';state.usedGrade='All';toast('Added to used stock');go('used');
+  },
+  usedSell:function(id){
+    var u=find(db.used,id),price=num(val('us_price')),method=val('us_method');
+    if(!price)return formErr('Enter the selling price.');
+    u.status='sold';u.soldPrice=price;u.soldAt=Date.now();
+    db.sales.push({id:uid(),ts:Date.now(),kind:'used',title:u.name+' (used)',price:price,cash:price,profit:price-u.buy,method:method,usedId:u.id});
+    save();toast('Sold for '+fmt(price)+' Birr, profit '+fmt(price-u.buy));state.sheet=null;render();
+  },
+  partSave:function(){
+    var name=val('pp_name'),cost=num(val('pp_cost'));
+    if(!name)return formErr('Enter the part name.');
+    db.parts.push({id:uid(),name:name,state:val('pp_state'),cost:cost,from:val('pp_from')||'Bought directly',fromId:'',status:'stock',ts:Date.now()});
+    save();state.sheet=null;state.partStatus='stock';state.partCat='All';toast('Part added');go('parts');
+  }
+};
+
+function confirmTrade(){
+  var c=tradeCalc(),t=state.trade;
+  if(c.miss.length)return;
+  var it=c.it;
+  if(it.track==='serial'){var ix=it.serials.indexOf(t.serial);if(ix<0)return toast('That unit is no longer in stock');it.serials.splice(ix,1);}
+  else{if(it.qty<1)return toast('Out of stock');it.qty-=1;}
+  var dev={id:uid(),name:t.name.trim(),imei:t.imei.trim(),grade:t.grade,buy:c.value,ask:num(t.ask),notes:t.customer.trim()?'Customer: '+t.customer.trim():'',status:'stock',ts:Date.now(),source:'trade-in'};
+  db.used.push(dev);
+  db.sales.push({id:uid(),ts:Date.now(),kind:'trade',title:it.name+' for '+dev.name,price:c.price,cash:c.diff,value:c.value,profit:c.price-it.cost,method:t.method,itemId:it.id,usedId:dev.id});
+  save();
+  state.tradeDone='Trade-in saved. '+it.name+' left stock, '+dev.name+' is now in used stock at '+fmt(c.value)+', and '+fmt(Math.abs(c.diff))+' Birr was '+(c.diff<0?'paid out':'received')+'.';
+  state.trade=freshTrade(t.method);render();window.scrollTo(0,0);
+}
+
+function apartDefaults(){return [{key:uid(),name:'Motherboard',state:'untested',share:'4'},{key:uid(),name:'Screen',state:'untested',share:'3'},{key:uid(),name:'Battery',state:'untested',share:'1'},{key:uid(),name:'Speaker',state:'untested',share:'1'}];}
+function apartStart(id){
+  var devs=db.used.filter(function(u){return u.status==='stock';});
+  state.apart={deviceId:id||(devs[0]?devs[0].id:''),rows:apartDefaults()};
+  openSheet({t:'apart'});
+}
+function apartSave(){
+  var a=state.apart,dev=find(db.used,a.deviceId);
+  if(!dev)return formErr('Choose a device.');
+  var rows=a.rows.filter(function(r){return r.name.trim();});
+  if(!rows.length)return formErr('List at least one part.');
+  var costs=apartCosts();
+  rows.forEach(function(r){db.parts.push({id:uid(),name:r.name.trim(),state:r.state,cost:costs[r.key],from:dev.name,fromId:dev.id,status:'stock',ts:Date.now()});});
+  dev.status='parts';dev.partedAt=Date.now();save();
+  state.sheet=null;state.partStatus='stock';state.partCat='All';state.apart=null;toast(rows.length+' parts added, cost of '+fmt(dev.buy)+' split');go('parts');
+}
+
+/* live updaters (no full re-render, so typing keeps focus) */
+var live={
+  newList:function(el){state.q=el.value;var l=$('#newList');if(l)l.innerHTML=newList();},
+  trade:function(){var s=$('#tradeSummary');if(s)s.innerHTML=tradeSummary();var b=$('#tradeGo');if(b)b.disabled=tradeCalc().miss.length>0;},
+  itemTrack:function(el){var s=el.value==='serial',q=$('#w_qty'),r=$('#w_serials');if(q)q.hidden=s;if(r)r.hidden=!s;},
+  apart:function(){var costs=apartCosts();state.apart.rows.forEach(function(r,idx){var c=$('#ap_c'+idx);if(c)c.textContent=r.name.trim()?fmt(costs[r.key]):'0';});}
+};
+
+/* ---------- events ---------- */
+document.addEventListener('click',function(e){
+  var el=e.target.closest('[data-a]');if(!el)return;
+  var a=el.getAttribute('data-a'),id=el.getAttribute('data-id'),v=el.getAttribute('data-v');
+  if(a==='overlay'){if(e.target===el)closeSheet();return;}
+  switch(a){
+    case 'tab':go(v);break;
+    case 'close':closeSheet();break;
+    case 'goLow':state.newCat='Low';go('new');break;
+    case 'goSell':state.newCat='All';state.q='';go('new');toast('Tap an item to sell it');break;
+    case 'setNewCat':state.newCat=v;render();break;
+    case 'setUsedGrade':state.usedGrade=v;render();break;
+    case 'setUsedStatus':state.usedStatus=v;render();break;
+    case 'setPartCat':state.partCat=v;render();break;
+    case 'setPartStatus':state.partStatus=v;render();break;
+    case 'item':openSheet({t:'item',id:id});break;
+    case 'itemNew':openSheet({t:'itemForm'});break;
+    case 'itemEdit':openSheet({t:'itemForm',id:id});break;
+    case 'itemDel':arm('delItem'+id,function(){db.items=db.items.filter(function(i){return i.id!==id;});save();state.sheet=null;toast('Item deleted');render();});break;
+    case 'used':openSheet({t:'used',id:id});break;
+    case 'usedNew':openSheet({t:'usedForm'});break;
+    case 'usedEdit':openSheet({t:'usedForm',id:id});break;
+    case 'usedDel':arm('delUsed'+id,function(){db.used=db.used.filter(function(u){return u.id!==id;});save();state.sheet=null;toast('Device deleted');render();});break;
+    case 'part':openSheet({t:'part',id:id});break;
+    case 'partNew':openSheet({t:'partForm'});break;
+    case 'partState':var p=find(db.parts,id);p.state=v;save();render();break;
+    case 'partUse':var p2=find(db.parts,id);p2.status=p2.status==='stock'?'used':'stock';save();toast(p2.status==='used'?'Marked as used':'Back in stock');state.sheet=null;render();break;
+    case 'partDel':arm('delPart'+id,function(){db.parts=db.parts.filter(function(x){return x.id!==id;});save();state.sheet=null;toast('Part deleted');render();});break;
+    case 'apartOpen':apartStart();break;
+    case 'apartFrom':apartStart(id);break;
+    case 'apartAdd':state.apart.rows.push({key:uid(),name:'',state:'untested',share:'1'});render();break;
+    case 'apartRm':state.apart.rows.splice(Number(v),1);render();break;
+    case 'apartGo':apartSave();break;
+    case 'tradeGrade':state.trade.grade=v;render();break;
+    case 'tradeMethod':state.trade.method=v;render();break;
+    case 'tradeGo':confirmTrade();break;
+    case 'settings':openSheet({t:'settings'});break;
+    case 'shopSave':db.shop=val('st_shop');save();toast('Name saved');state.sheet=null;render();break;
+    case 'copyBackup':
+      var ta=$('#bk_out');
+      var fallback=function(){ta.focus();ta.select();toast('Press and hold to copy the selected text');};
+      try{navigator.clipboard.writeText(ta.value).then(function(){toast('Backup copied');},fallback);}catch(err){fallback();}
+      break;
+    case 'restore':
+      try{
+        var o=JSON.parse(val('bk_in'));
+        if(!o||!Array.isArray(o.items)||!Array.isArray(o.used)||!Array.isArray(o.parts)||!Array.isArray(o.sales))throw new Error('x');
+        db=o;save();state.sheet=null;toast('Backup restored');render();
+      }catch(err){formErr('That text is not a valid backup. Paste the full text you copied.');}
+      break;
+    case 'clearDemo':
+      var keep=function(x){return !x.demo;};
+      db.items=db.items.filter(keep);db.used=db.used.filter(keep);db.parts=db.parts.filter(keep);db.sales=db.sales.filter(keep);db.demo=false;save();state.sheet=null;toast('Example data removed');render();break;
+    case 'resetAll':arm('reset',function(){db=emptyDb();save();state.sheet=null;state.trade=freshTrade();toast('Everything erased');render();});break;
+  }
+});
+document.addEventListener('submit',function(e){
+  var f=e.target.closest('[data-form]');if(!f)return;
+  e.preventDefault();
+  var fn=forms[f.getAttribute('data-form')];if(fn)fn(f.getAttribute('data-id')||'');
+});
+document.addEventListener('input',function(e){
+  var el=e.target;
+  if(el.hasAttribute('data-row')){var r=state.apart.rows[Number(el.getAttribute('data-row'))];if(r){r[el.getAttribute('data-field')]=el.value;live.apart();}return;}
+  var b=el.getAttribute('data-bind');
+  if(b){var k=b.split('.');state[k[0]][k[1]]=el.value;state.tradeDone=null;}
+  var l=el.getAttribute('data-live');if(l&&live[l])live[l](el);
+});
+document.addEventListener('change',function(e){
+  var el=e.target;
+  if(el.id==='ap_dev'){state.apart.deviceId=el.value;render();return;}
+  if(el.hasAttribute('data-row')){var r=state.apart.rows[Number(el.getAttribute('data-row'))];if(r){r[el.getAttribute('data-field')]=el.value;live.apart();}return;}
+  var b=el.getAttribute('data-bind');
+  if(b==='trade.itemId'){var it=find(db.items,el.value);state.trade.itemId=el.value;state.trade.serial='';state.trade.price=it?String(it.price):'';state.tradeDone=null;render();return;}
+  if(b==='trade.serial'){state.trade.serial=el.value;live.trade();}
+  /* text inputs already updated on 'input'; redoing it on blur would replace a row the user is tapping */
+  var l=el.getAttribute('data-live');if(l&&el.tagName==='SELECT'&&live[l])live[l](el);
+});
+
+render();
+})();
+</script>
+
+<button class="btn primary" id="installBtn" hidden>Install app</button>
+<script>
+(function(){
+  try{if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}}catch(e){}
+  var dp=null,b=document.getElementById('installBtn');
+  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();dp=e;b.hidden=false;});
+  b.addEventListener('click',function(){if(!dp)return;dp.prompt();dp.userChoice.then(function(){dp=null;b.hidden=true;});});
+  window.addEventListener('appinstalled',function(){dp=null;b.hidden=true;});
+})();
+</script>
+
+</body>
+</html>
