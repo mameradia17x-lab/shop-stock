@@ -1021,7 +1021,6 @@ function viewHome(){
   var backupDue=!db.demo&&hasData&&(!db.settings.backupAt||daysSince(db.settings.backupAt)>=14);
   return '<header class="top"><div><p class="sub" style="margin:0 0 2px">'+esc(today)+'</p><h1>'+esc(db.shop||T('Your shop'))+'</h1></div><div class="acts">'+
     iconBtn('page',I.bell,T('Notifications'),unseen?'<span class="badge">'+unseen+'</span>':'','notifications')+iconBtn('page',I.menu,T('Menu'),'','menu')+'</div></header>'+
-  (db.demo?'<div class="banner"><span>'+esc(T('You are looking at example data. Remove it before you start with your real stock.'))+'</span><button data-a="clearDemo">'+esc(T('Remove'))+'</button></div>':'')+
   (!storageOK?'<div class="banner"><span>'+esc(T('This browser is not saving data. Your changes will be lost when you close the page.'))+'</span></div>':'')+
   (backupDue?'<div class="banner"><span>'+esc(T('You have not backed up your data for a while.'))+'</span><button data-a="page" data-v="settings">'+esc(T('Back up'))+'</button></div>':'')+
   '<button class="hero" data-a="goSales" data-v="today"><div class="toprow"><div><div class="label">'+esc(T("Today's sales"))+'</div><div class="big num">'+fmt(tot.value)+'<span>'+esc(T('Birr'))+'</span></div></div>'+ic(I.chev,22)+'</div>'+
