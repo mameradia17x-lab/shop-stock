@@ -329,6 +329,8 @@ function act(a,el){
       ask({title:T('Confirm trade-in?'),msg:T('Are you sure you want to record this trade-in?'),html:tradeSummary(),ok:T('Yes, record it'),fn:doTrade});return false;
     /* settings */
     case 'setLang':db.settings.lang=v;save();applyTheme();break;
+    case 'setBg':db.settings.bgStyle=v;save();applyTheme();render();break;
+    case 'colReset':db.settings.cAccent='';db.settings.cBar='#6EA8FE';db.settings.bgStyle='charcoal';save();applyTheme();render();break;
     case 'setMode':db.settings.mode=v;save();applyTheme();break;
     case 'setPalette':db.settings.palette=v;save();applyTheme();break;
     case 'setSize':db.settings.textSize=v;save();applyTheme();break;
@@ -397,3 +399,6 @@ function deliverGo(id){
   var sale=deliverRepair(r,fee,f.f_m||'Cash',paid,num(f.f_oc));
   toast(T('Repair delivered'));openSheet({t:'sale',id:sale.id,done:T('Repair recorded as a sale.')});return false;
 }
+
+addEventListener('input',function(e){var c=e.target&&e.target.getAttribute&&e.target.getAttribute('data-col');if(c){db.settings[c]=e.target.value;save();applyTheme();}});
+addEventListener('beforeinstallprompt',function(e){e.preventDefault();});

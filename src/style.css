@@ -1,6 +1,6 @@
 /* Shop Stock styles. Colors come from CSS variables that the app sets from the chosen mode and palette. */
 :root{
-  --font:'Plus Jakarta Sans','Noto Sans Ethiopic',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font:'Inter','Noto Sans Ethiopic',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --bg:#F3F5F7; --surface:#FFFFFF; --ink:#0F1B2D; --muted:#566275; --line:#E1E6EC;
   --field-line:#8793A6; --accent:#0E7C66; --accent-ink:#FFFFFF; --accent-soft:#E2F3EE;
   --hero:#0F1B2D; --hero-ink:#FFFFFF; --hero-muted:#A9B6C6; --hero-line:#2B3A52;
@@ -180,3 +180,17 @@ button.hero{cursor:pointer}
 .progress{height:8px;border-radius:4px;background:var(--seg);overflow:hidden}
 .progress i{display:block;height:8px;background:var(--accent)}
 @media (prefers-reduced-motion: no-preference){.panel{animation:rise .18s ease-out}@keyframes rise{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}}
+
+/* v3: charcoal, wide headings, custom colors */
+body{background-color:var(--bg)}
+.top h1{font-family:'Unbounded','Inter',sans-serif;text-transform:uppercase;font-weight:700;font-size:21px;letter-spacing:-.01em}
+.card,.flush,.tile{border:1.5px solid var(--line);box-shadow:none}
+.hero{background:var(--surface)!important;border:1.5px solid var(--line);border-radius:24px;box-shadow:none}
+.hero .big{font-weight:700;letter-spacing:-.04em}
+.wk{display:flex;gap:8px;border-top:1px solid var(--line);padding-top:14px}
+.wc{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;color:var(--hero-muted)}
+.wb{width:100%;height:54px;border-radius:8px;background:var(--seg);display:flex;align-items:flex-end;overflow:hidden}
+.wb i{display:block;width:100%;border-radius:8px;background:var(--bar);opacity:.55}.wc.on .wb i{opacity:1}.wc.on{color:var(--hero-ink);font-weight:700}
+.cpick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:6px 0 10px}.cpick label{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted)}
+.cpick input{width:100%;height:46px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);padding:3px}
+html[data-mode="dark"] .tab.add .plus,html[data-mode="dark"] .fab{background:#fff;color:#111}

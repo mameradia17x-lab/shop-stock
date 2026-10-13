@@ -46,6 +46,8 @@ function viewHome(){
   var alerts=visibleAlerts(),unseen=unseenAlerts().length;
   var recent=db.sales.filter(function(s){return !s.voided;}).sort(function(a,b){return b.ts-a.ts;}).slice(0,5);
   var today=dfmt(Date.now(),{weekday:'long',month:'short',day:'numeric'});
+  var wk=[],wmx=1,wi;for(wi=6;wi>=0;wi--){var d0=addDays(t0,-wi),d1=addDays(d0,1),val=totalsFor(salesBetween(d0,d1,false),d0,d1).value;wk.push({v:val,l:dfmt(d0,{weekday:'narrow'}),t:wi===0});if(val>wmx)wmx=val;}
+  var weekHtml='<div class="wk">'+wk.map(function(x){return '<div class="wc'+(x.t?' on':'')+'"><div class="wb"><i style="height:'+Math.max(4,Math.round(x.v/wmx*100))+'%"></i></div><span>'+esc(x.l)+'</span></div>';}).join('')+'</div>';
   var hasData=db.items.length+db.used.length+db.sales.length>0;
   var backupDue=!db.demo&&hasData&&(!db.settings.backupAt||daysSince(db.settings.backupAt)>=14);
   return '<header class="top"><div><p class="sub" style="margin:0 0 2px">'+esc(today)+'</p><h1>'+esc(db.shop||T('Your shop'))+'</h1></div><div class="acts">'+
@@ -53,7 +55,7 @@ function viewHome(){
   (!storageOK?'<div class="banner"><span>'+esc(T('This browser is not saving data. Your changes will be lost when you close the page.'))+'</span></div>':'')+
   (backupDue?'<div class="banner"><span>'+esc(T('You have not backed up your data for a while.'))+'</span><button data-a="page" data-v="settings">'+esc(T('Back up'))+'</button></div>':'')+
   '<button class="hero" data-a="goSales" data-v="today"><div class="toprow"><div><div class="label">'+esc(T("Today's sales"))+'</div><div class="big num">'+fmt(tot.value)+'<span>'+esc(T('Birr'))+'</span></div></div>'+ic(I.chev,22)+'</div>'+
-  '<div class="stats"><div><div class="label">'+esc(T('Profit'))+'</div><b class="num">'+fmt(tot.profit)+'</b></div><div><div class="label">'+esc(T('Cash in'))+'</div><b class="num">'+fmt(tot.cash)+'</b></div><div><div class="label">'+esc(T('Spent'))+'</div><b class="num">'+fmt(spent)+'</b></div></div></button>'+
+  '<div class="stats"><div><div class="label">'+esc(T('Profit'))+'</div><b class="num">'+fmt(tot.profit)+'</b></div><div><div class="label">'+esc(T('Cash in'))+'</div><b class="num">'+fmt(tot.cash)+'</b></div><div><div class="label">'+esc(T('Spent'))+'</div><b class="num">'+fmt(spent)+'</b></div></div>'+weekHtml+'</button>'+
   '<section class="tiles"><button class="tile" data-a="goLow"><b class="num" style="color:'+(low?'var(--bad)':'var(--ink)')+'">'+low+'</b><span>'+esc(T('Low stock'))+'</span></button>'+
   '<button class="tile" data-a="page" data-v="slow"><b class="num" style="color:'+(slow?'var(--warn)':'var(--ink)')+'">'+slow+'</b><span>'+esc(T('Slow stock'))+'</span></button>'+
   '<button class="tile" data-a="goRepair"><b class="num">'+openR+'</b><span>'+esc(T('Open repairs'))+'</span></button>'+
@@ -391,6 +393,7 @@ function pageSettings(){
   '<section class="card form"><h3 style="margin:0">'+esc(T('Language'))+'</h3>'+segHtml([{v:'en',t:'English'},{v:'am',t:'አማርኛ'},{v:'om',t:'Afaan Oromoo'}],s.lang,'setLang')+'<small>'+esc(T('Translations are a first draft. Tell us which words to change.'))+'</small></section>'+
   '<section class="card form"><h3 style="margin:0">'+esc(T('Appearance'))+'</h3>'+
   '<div class="field">'+esc(T('Mode'))+'</div>'+segHtml([{v:'auto',t:T('Automatic')},{v:'light',t:T('Light')},{v:'dark',t:T('Dark')}],s.mode,'setMode')+
+  '<div class="field">'+esc(T('Background'))+'</div>'+'<div class="seg">'+['charcoal','black','navy'].map(function(k){return '<button type="button" data-a="setBg" data-v="'+k+'" aria-pressed="'+((s.bgStyle||'charcoal')===k)+'">'+k.charAt(0).toUpperCase()+k.slice(1)+'</button>';}).join('')+'</div>'+'<div class="field">'+esc(T('Your colors'))+'</div><div class="cpick"><label>'+esc(T('Main color'))+'<input type="color" data-col="cAccent" value="'+(s.cAccent||'#A98BFF')+'"></label><label>'+esc(T('Chart color'))+'<input type="color" data-col="cBar" value="'+s.cBar+'"></label></div><button class="btn wide" data-a="colReset">'+esc(T('Reset colors'))+'</button>'+
   '<div class="field">'+esc(T('Color theme'))+'</div><div class="swatches">'+swatches+'</div>'+
   '<div class="field">'+esc(T('Text size'))+'</div>'+segHtml([{v:'normal',t:T('Normal')},{v:'large',t:T('Large')}],s.textSize,'setSize')+'</section>'+
   '<section class="card form"><h3 style="margin:0">'+esc(T('Stock and reports'))+'</h3>'+

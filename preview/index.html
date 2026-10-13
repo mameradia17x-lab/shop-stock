@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Shop Stock (preview)</title>
-<meta name="theme-color" content="#F3F5F7">
+<meta name="theme-color" content="#1B1B1D">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Shop Stock (preview)">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Ethiopic:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Unbounded:wght@600;700&family=Noto+Sans+Ethiopic:wght@400;600;700&display=swap">
 <style>
 /* Shop Stock styles. Colors come from CSS variables that the app sets from the chosen mode and palette. */
 :root{
-  --font:'Plus Jakarta Sans','Noto Sans Ethiopic',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font:'Inter','Noto Sans Ethiopic',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --bg:#F3F5F7; --surface:#FFFFFF; --ink:#0F1B2D; --muted:#566275; --line:#E1E6EC;
   --field-line:#8793A6; --accent:#0E7C66; --accent-ink:#FFFFFF; --accent-soft:#E2F3EE;
   --hero:#0F1B2D; --hero-ink:#FFFFFF; --hero-muted:#A9B6C6; --hero-line:#2B3A52;
@@ -196,6 +196,20 @@ button.hero{cursor:pointer}
 .progress i{display:block;height:8px;background:var(--accent)}
 @media (prefers-reduced-motion: no-preference){.panel{animation:rise .18s ease-out}@keyframes rise{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}}
 
+/* v3: charcoal, wide headings, custom colors */
+body{background-color:var(--bg)}
+.top h1{font-family:'Unbounded','Inter',sans-serif;text-transform:uppercase;font-weight:700;font-size:21px;letter-spacing:-.01em}
+.card,.flush,.tile{border:1.5px solid var(--line);box-shadow:none}
+.hero{background:var(--surface)!important;border:1.5px solid var(--line);border-radius:24px;box-shadow:none}
+.hero .big{font-weight:700;letter-spacing:-.04em}
+.wk{display:flex;gap:8px;border-top:1px solid var(--line);padding-top:14px}
+.wc{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;color:var(--hero-muted)}
+.wb{width:100%;height:54px;border-radius:8px;background:var(--seg);display:flex;align-items:flex-end;overflow:hidden}
+.wb i{display:block;width:100%;border-radius:8px;background:var(--bar);opacity:.55}.wc.on .wb i{opacity:1}.wc.on{color:var(--hero-ink);font-weight:700}
+.cpick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:6px 0 10px}.cpick label{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted)}
+.cpick input{width:100%;height:46px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);padding:3px}
+html[data-mode="dark"] .tab.add .plus,html[data-mode="dark"] .fab{background:#fff;color:#111}
+
 </style>
 </head>
 <body>
@@ -339,6 +353,7 @@ var MODES={
     'hero-ink':'#FFFFFF','hero-muted':'#C3CCDA','hero-line':'rgba(255,255,255,.2)'}
 };
 var PALETTES={
+  violet:{name:'Violet',light:{'accent':'#6D4FD8','accent-ink':'#FFFFFF','accent-soft':'#EFEAFC','hero':'#FFFFFF'},dark:{'accent':'#A98BFF','accent-ink':'#14101F','accent-soft':'#2C2640','hero':'#252528'}},
   teal:{name:'Teal',light:{'accent':'#0E7C66','accent-ink':'#FFFFFF','accent-soft':'#E2F3EE','hero':'#0F1B2D'},dark:{'accent':'#3CC5A3','accent-ink':'#04231B','accent-soft':'#12342C','hero':'#1B2A40'}},
   ocean:{name:'Ocean',light:{'accent':'#1D5FD1','accent-ink':'#FFFFFF','accent-soft':'#E4EDFC','hero':'#0E2347'},dark:{'accent':'#6AA5FF','accent-ink':'#061631','accent-soft':'#15294D','hero':'#16305C'}},
   sunset:{name:'Sunset',light:{'accent':'#B4470C','accent-ink':'#FFFFFF','accent-soft':'#FCEBDD','hero':'#3A1A0A'},dark:{'accent':'#FFA05A','accent-ink':'#2A1100','accent-soft':'#43260F','hero':'#47260F'}},
@@ -349,6 +364,9 @@ var PALETTES={
 function isDark(){var m=db.settings.mode;return m==='dark'||(m==='auto'&&!!window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);}
 function applyTheme(){
   var s=db.settings,dk=isDark(),root=document.documentElement,p=PALETTES[s.palette]||PALETTES.teal,vars=extend(extend({},dk?MODES.dark:MODES.light),p[dk?'dark':'light']);
+  if(dk){var B={charcoal:{bg:'#1B1B1D',surface:'#252528',line:'#3A3A3F',seg:'#2F2F33'},black:{bg:'#000000',surface:'#111113',line:'#2A2A2E',seg:'#1A1A1D'},navy:{bg:'#0B0E17',surface:'#141927',line:'#222A3F',seg:'#1B2236'}}[s.bgStyle||'charcoal'];vars.bg=B.bg;vars.surface=B.surface;vars.line=B.line;vars.seg=B.seg;vars.hero=B.surface;}
+  var ac=s.cAccent;if(/^#[0-9a-f]{6}$/i.test(ac||'')){var r=parseInt(ac.substr(1,2),16),g=parseInt(ac.substr(3,2),16),bl=parseInt(ac.substr(5,2),16);vars.accent=ac;vars['accent-ink']=(r*.299+g*.587+bl*.114)>150?'#111111':'#FFFFFF';vars['accent-soft']='rgba('+r+','+g+','+bl+',.18)';}
+  vars.bar=s.cBar||'#6EA8FE';
   for(var k in vars)root.style.setProperty('--'+k,vars[k]);
   root.setAttribute('data-mode',dk?'dark':'light');
   root.setAttribute('data-size',s.textSize==='large'?'large':'normal');
@@ -357,7 +375,7 @@ function applyTheme(){
 }
 
 /* ---------- saved data ---------- */
-function defaultSettings(){return {lang:'en',mode:'auto',palette:'teal',textSize:'normal',slowDays:30,weekStart:1,backupAt:0};}
+function defaultSettings(){return {lang:'en',mode:'dark',palette:'violet',ui:3,bgStyle:'charcoal',cAccent:'',cBar:'#6EA8FE',textSize:'normal',slowDays:30,weekStart:1,backupAt:0};}
 function emptyDb(){return {v:2,shop:'',demo:false,settings:defaultSettings(),items:[],used:[],parts:[],sales:[],repairs:[],expenses:[],activity:[],alertsDismissed:{},alertsSeen:{}};}
 function guessDevCat(name,hasImei){
   var n=String(name||'').toLowerCase();
@@ -417,7 +435,7 @@ function load(){
     if(s){
       var o=JSON.parse(s);
       if(o&&o.v!==2){try{localStorage.setItem(KEY+'.before-v2',s);}catch(e){}}
-      var m=migrate(o);if(m)return m;
+      var m=migrate(o);if(m){m.settings=Object.assign(defaultSettings(),m.settings||{});if(m.settings.ui!==3){m.settings.ui=3;m.settings.palette='violet';m.settings.mode='dark';m.settings.bgStyle='charcoal';}return m;}
     }
   }catch(e){storageOK=false;}
   return null;
@@ -1017,6 +1035,8 @@ function viewHome(){
   var alerts=visibleAlerts(),unseen=unseenAlerts().length;
   var recent=db.sales.filter(function(s){return !s.voided;}).sort(function(a,b){return b.ts-a.ts;}).slice(0,5);
   var today=dfmt(Date.now(),{weekday:'long',month:'short',day:'numeric'});
+  var wk=[],wmx=1,wi;for(wi=6;wi>=0;wi--){var d0=addDays(t0,-wi),d1=addDays(d0,1),val=totalsFor(salesBetween(d0,d1,false),d0,d1).value;wk.push({v:val,l:dfmt(d0,{weekday:'narrow'}),t:wi===0});if(val>wmx)wmx=val;}
+  var weekHtml='<div class="wk">'+wk.map(function(x){return '<div class="wc'+(x.t?' on':'')+'"><div class="wb"><i style="height:'+Math.max(4,Math.round(x.v/wmx*100))+'%"></i></div><span>'+esc(x.l)+'</span></div>';}).join('')+'</div>';
   var hasData=db.items.length+db.used.length+db.sales.length>0;
   var backupDue=!db.demo&&hasData&&(!db.settings.backupAt||daysSince(db.settings.backupAt)>=14);
   return '<header class="top"><div><p class="sub" style="margin:0 0 2px">'+esc(today)+'</p><h1>'+esc(db.shop||T('Your shop'))+'</h1></div><div class="acts">'+
@@ -1024,7 +1044,7 @@ function viewHome(){
   (!storageOK?'<div class="banner"><span>'+esc(T('This browser is not saving data. Your changes will be lost when you close the page.'))+'</span></div>':'')+
   (backupDue?'<div class="banner"><span>'+esc(T('You have not backed up your data for a while.'))+'</span><button data-a="page" data-v="settings">'+esc(T('Back up'))+'</button></div>':'')+
   '<button class="hero" data-a="goSales" data-v="today"><div class="toprow"><div><div class="label">'+esc(T("Today's sales"))+'</div><div class="big num">'+fmt(tot.value)+'<span>'+esc(T('Birr'))+'</span></div></div>'+ic(I.chev,22)+'</div>'+
-  '<div class="stats"><div><div class="label">'+esc(T('Profit'))+'</div><b class="num">'+fmt(tot.profit)+'</b></div><div><div class="label">'+esc(T('Cash in'))+'</div><b class="num">'+fmt(tot.cash)+'</b></div><div><div class="label">'+esc(T('Spent'))+'</div><b class="num">'+fmt(spent)+'</b></div></div></button>'+
+  '<div class="stats"><div><div class="label">'+esc(T('Profit'))+'</div><b class="num">'+fmt(tot.profit)+'</b></div><div><div class="label">'+esc(T('Cash in'))+'</div><b class="num">'+fmt(tot.cash)+'</b></div><div><div class="label">'+esc(T('Spent'))+'</div><b class="num">'+fmt(spent)+'</b></div></div>'+weekHtml+'</button>'+
   '<section class="tiles"><button class="tile" data-a="goLow"><b class="num" style="color:'+(low?'var(--bad)':'var(--ink)')+'">'+low+'</b><span>'+esc(T('Low stock'))+'</span></button>'+
   '<button class="tile" data-a="page" data-v="slow"><b class="num" style="color:'+(slow?'var(--warn)':'var(--ink)')+'">'+slow+'</b><span>'+esc(T('Slow stock'))+'</span></button>'+
   '<button class="tile" data-a="goRepair"><b class="num">'+openR+'</b><span>'+esc(T('Open repairs'))+'</span></button>'+
@@ -1362,6 +1382,7 @@ function pageSettings(){
   '<section class="card form"><h3 style="margin:0">'+esc(T('Language'))+'</h3>'+segHtml([{v:'en',t:'English'},{v:'am',t:'አማርኛ'},{v:'om',t:'Afaan Oromoo'}],s.lang,'setLang')+'<small>'+esc(T('Translations are a first draft. Tell us which words to change.'))+'</small></section>'+
   '<section class="card form"><h3 style="margin:0">'+esc(T('Appearance'))+'</h3>'+
   '<div class="field">'+esc(T('Mode'))+'</div>'+segHtml([{v:'auto',t:T('Automatic')},{v:'light',t:T('Light')},{v:'dark',t:T('Dark')}],s.mode,'setMode')+
+  '<div class="field">'+esc(T('Background'))+'</div>'+'<div class="seg">'+['charcoal','black','navy'].map(function(k){return '<button type="button" data-a="setBg" data-v="'+k+'" aria-pressed="'+((s.bgStyle||'charcoal')===k)+'">'+k.charAt(0).toUpperCase()+k.slice(1)+'</button>';}).join('')+'</div>'+'<div class="field">'+esc(T('Your colors'))+'</div><div class="cpick"><label>'+esc(T('Main color'))+'<input type="color" data-col="cAccent" value="'+(s.cAccent||'#A98BFF')+'"></label><label>'+esc(T('Chart color'))+'<input type="color" data-col="cBar" value="'+s.cBar+'"></label></div><button class="btn wide" data-a="colReset">'+esc(T('Reset colors'))+'</button>'+
   '<div class="field">'+esc(T('Color theme'))+'</div><div class="swatches">'+swatches+'</div>'+
   '<div class="field">'+esc(T('Text size'))+'</div>'+segHtml([{v:'normal',t:T('Normal')},{v:'large',t:T('Large')}],s.textSize,'setSize')+'</section>'+
   '<section class="card form"><h3 style="margin:0">'+esc(T('Stock and reports'))+'</h3>'+
@@ -2216,6 +2237,8 @@ function act(a,el){
       ask({title:T('Confirm trade-in?'),msg:T('Are you sure you want to record this trade-in?'),html:tradeSummary(),ok:T('Yes, record it'),fn:doTrade});return false;
     /* settings */
     case 'setLang':db.settings.lang=v;save();applyTheme();break;
+    case 'setBg':db.settings.bgStyle=v;save();applyTheme();render();break;
+    case 'colReset':db.settings.cAccent='';db.settings.cBar='#6EA8FE';db.settings.bgStyle='charcoal';save();applyTheme();render();break;
     case 'setMode':db.settings.mode=v;save();applyTheme();break;
     case 'setPalette':db.settings.palette=v;save();applyTheme();break;
     case 'setSize':db.settings.textSize=v;save();applyTheme();break;
@@ -2284,6 +2307,9 @@ function deliverGo(id){
   var sale=deliverRepair(r,fee,f.f_m||'Cash',paid,num(f.f_oc));
   toast(T('Repair delivered'));openSheet({t:'sale',id:sale.id,done:T('Repair recorded as a sale.')});return false;
 }
+
+addEventListener('input',function(e){var c=e.target&&e.target.getAttribute&&e.target.getAttribute('data-col');if(c){db.settings[c]=e.target.value;save();applyTheme();}});
+addEventListener('beforeinstallprompt',function(e){e.preventDefault();});
 
 /* Shop Stock start-up. */
 (function(){
