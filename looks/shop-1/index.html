@@ -1,0 +1,2328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Shop Stock (preview)</title>
+<meta name="theme-color" content="#1B1B1D">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Shop Stock (preview)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Unbounded:wght@600;700&family=Noto+Sans+Ethiopic:wght@400;600;700&display=swap">
+<style>
+/* Shop Stock styles. Colors come from CSS variables that the app sets from the chosen mode and palette. */
+:root{
+  --font:'Inter','Noto Sans Ethiopic',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --bg:#F3F5F7; --surface:#FFFFFF; --ink:#0F1B2D; --muted:#566275; --line:#E1E6EC;
+  --field-line:#8793A6; --accent:#0E7C66; --accent-ink:#FFFFFF; --accent-soft:#E2F3EE;
+  --hero:#0F1B2D; --hero-ink:#FFFFFF; --hero-muted:#A9B6C6; --hero-line:#2B3A52;
+  --bad:#B42318; --bad-bg:#FDE7E5; --warn:#7A4100; --warn-bg:#FFEBCF; --good:#0B6150; --good-bg:#E2F3EE;
+  --seg:#E3E8EE; --scrim:rgba(15,27,45,.5);
+  --gA-bg:#0B6150; --gA-fg:#FFFFFF; --gB-bg:#BFE6DA; --gB-fg:#0B3D33; --gC-bg:#FFE3A3; --gC-fg:#5C3B00;
+  --gD-bg:#F4B58A; --gD-fg:#4A2000; --gE-bg:#D5DAE1; --gE-fg:#243044;
+}
+*{box-sizing:border-box}
+html{color-scheme:light}
+html[data-mode="dark"]{color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.4;padding-inline:16px;padding-block:calc(16px + env(safe-area-inset-top,0px)) 112px;-webkit-text-size-adjust:100%}
+html[data-size="large"] body{zoom:1.14}
+body.nonav{padding-bottom:40px}
+#app{max-width:480px;margin-inline:auto;display:flex;flex-direction:column;gap:14px}
+h1,h2,h3,p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+small{font-size:13px;color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.top h1{font-size:24px;font-weight:800;letter-spacing:-.2px;overflow-wrap:anywhere}
+.top .acts{display:flex;gap:8px;flex:none}
+.sub{font-size:13px;color:var(--muted);margin-top:2px}
+.pagehead{display:flex;align-items:center;gap:12px}
+.pagehead h1{font-size:22px;font-weight:800;flex:1;min-width:0;overflow-wrap:anywhere}
+.iconbtn{flex:none;width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:flex;align-items:center;justify-content:center;padding:0;position:relative}
+.iconbtn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.badge{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;border-radius:10px;background:var(--bad);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 5px}
+[data-mode="dark"] .badge{color:#1A0505}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:14px 16px}
+.card.flush{padding-block:4px}
+.card h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.cardhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}
+.cardhead h3{margin:0}
+.link{min-height:44px;padding:0 4px;border:none;background:transparent;color:var(--accent);font-weight:700;font-size:14px}
+.hero{background:var(--hero);color:var(--hero-ink);border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:16px;border:none;width:100%;text-align:left;font:inherit}
+button.hero{cursor:pointer}
+.hero .label{font-size:13px;color:var(--hero-muted)}
+.hero .big{font-size:38px;font-weight:800;letter-spacing:-.5px;margin-top:4px}
+.hero .big span{font-size:15px;font-weight:600;color:var(--hero-muted);margin-left:6px}
+.hero .toprow{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.hero .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;border-top:1px solid var(--hero-line);padding-top:14px}
+.hero .stats b{display:block;font-size:16px;margin-top:2px}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;text-align:left;display:block;width:100%;color:var(--ink)}
+.tile b{display:block;font-size:26px;font-weight:800}
+.tile span{font-size:13px;color:var(--muted)}
+.tiles2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.btn{min-height:48px;border-radius:14px;border:1px solid var(--field-line);background:var(--surface);color:var(--ink);font-weight:700;padding:0 16px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-align:center}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.armed,.btn.dangerfill{background:var(--bad);color:#fff;border-color:var(--bad)}
+[data-mode="dark"] .btn.armed,[data-mode="dark"] .btn.dangerfill{color:#1A0505}
+.btn.sm{min-height:44px;font-size:14px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.wide{width:100%}
+.btns{display:flex;gap:12px}
+.btns>*{flex:1}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;min-height:44px;min-width:44px;padding:0 16px;border-radius:999px;border:1px solid var(--field-line);background:var(--surface);font-weight:600;font-size:14px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.seg{display:flex;gap:4px;padding:4px;border-radius:16px;background:var(--seg)}
+.seg button{flex:1;min-height:44px;border-radius:12px;border:none;background:transparent;font-weight:700;font-size:14px;padding:0 6px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.search{display:flex;align-items:center;gap:10px;min-height:48px;border-radius:14px;border:1px solid var(--field-line);background:var(--surface);padding:0 14px;color:var(--muted)}
+.search input{flex:1;min-width:0;border:none;background:transparent;outline:none;min-height:46px;color:var(--ink)}
+.row{display:flex;align-items:center;gap:12px;width:100%;padding:12px 0;border:none;border-bottom:1px solid var(--line);background:transparent;text-align:left;min-height:64px;color:var(--ink)}
+.row:last-child{border-bottom:none}
+.row .grow{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.row .grow b{font-weight:700;overflow-wrap:anywhere}
+.row .end{text-align:right;display:flex;flex-direction:column;gap:2px;align-items:flex-end}
+.row .end b{font-weight:800}
+.row.off{opacity:.6}
+.row.off .grow b{text-decoration:line-through}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.tag.bad{background:var(--bad-bg);color:var(--bad)}
+.tag.warn{background:var(--warn-bg);color:var(--warn)}
+.tag.good{background:var(--good-bg);color:var(--good)}
+.tag.info{background:var(--accent-soft);color:var(--accent)}
+.tag.gray{background:var(--seg);color:var(--muted)}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:3px}
+.grade{flex:none;width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800}
+.gA{background:var(--gA-bg);color:var(--gA-fg)}.gB{background:var(--gB-bg);color:var(--gB-fg)}.gC{background:var(--gC-bg);color:var(--gC-fg)}
+.gD{background:var(--gD-bg);color:var(--gD-fg)}.gE{background:var(--gE-bg);color:var(--gE-fg)}
+.stockn{font-size:22px;font-weight:800}
+.banner{display:flex;align-items:center;gap:12px;background:var(--warn-bg);color:var(--warn);border-radius:16px;padding:12px 14px;font-size:13px}
+.banner span{flex:1}
+.banner button{flex:none;min-height:44px;padding:0 12px;border-radius:12px;border:1px solid currentColor;background:transparent;font-weight:700;color:inherit}
+.okbox{background:var(--good-bg);color:var(--good);border-radius:16px;padding:12px 14px;font-size:14px;display:flex;gap:10px;align-items:flex-start}
+.okbox span{flex:1}
+.warnbox{background:var(--warn-bg);color:var(--warn);border-radius:14px;padding:10px 12px;font-size:13px;font-weight:600}
+.empty{padding:22px 8px;text-align:center;color:var(--muted);font-size:14px}
+.field{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--muted)}
+.field input,.field select,.field textarea{width:100%;min-height:48px;border-radius:14px;border:1px solid var(--field-line);background:var(--surface);padding:0 14px;font-size:16px;color:var(--ink)}
+.field textarea{padding:12px 14px;min-height:96px;resize:vertical}
+.field small{font-weight:500}
+.field.err input,.field.err textarea{border-color:var(--bad)}
+.form{display:flex;flex-direction:column;gap:12px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px}
+.facts div small{display:block}
+.facts div b{display:block;margin-top:2px;overflow-wrap:anywhere}
+.sum{display:flex;flex-direction:column;gap:10px}
+.sum .l{display:flex;justify-content:space-between;gap:12px;font-size:14px}
+.sum .l span:first-child{color:var(--muted)}
+.sum .total{border-top:1px solid var(--line);padding-top:12px;display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.sum .total b{font-size:28px;font-weight:800;color:var(--accent)}
+.sum .total b.out{color:var(--warn)}
+.steps{display:flex;flex-direction:column;gap:8px;font-size:13px;line-height:1.4}
+.steps div{display:flex;gap:10px;align-items:flex-start}
+.steps svg{flex:none;margin-top:1px;color:var(--good)}
+.err{background:var(--bad-bg);color:var(--bad);border-radius:12px;padding:10px 12px;font-size:14px;font-weight:600}
+.scrim{position:fixed;inset:0;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center;z-index:30}
+.scrim.center{align-items:center;padding:16px;z-index:50}
+.panel{width:100%;max-width:480px;max-height:92%;overflow-y:auto;background:var(--surface);color:var(--ink);border-radius:24px 24px 0 0;padding:16px 16px calc(24px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px;outline:none}
+.scrim.center .panel{border-radius:24px;max-height:86%}
+.panel .head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.panel h2{font-size:20px;font-weight:800;overflow-wrap:anywhere}
+.divider{border:none;border-top:1px solid var(--line);margin:2px 0;width:100%}
+.nav{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);z-index:20;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px))}
+.nav .in{max-width:480px;margin-inline:auto;display:flex;justify-content:space-around;align-items:flex-start}
+.nav button{width:66px;min-height:56px;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--muted);padding:0}
+.nav button[aria-current="page"]{color:var(--accent);font-weight:700}
+.nav .mid{margin-top:-26px}
+.nav .mid .disc{width:56px;height:56px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(0,0,0,.28)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(100px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;font-size:14px;font-weight:600;z-index:60;max-width:calc(100% - 32px);text-align:center}
+.catgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.catcard{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px;text-align:left;display:flex;flex-direction:column;gap:6px;min-height:112px;color:var(--ink)}
+.catcard .ci{width:40px;height:40px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center}
+.catcard b{font-size:16px}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper button{width:44px;height:44px;border-radius:12px;border:1px solid var(--field-line);background:var(--surface);font-size:20px;font-weight:700;line-height:1;padding:0}
+.stepper b{min-width:28px;text-align:center}
+.unitlist{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;max-height:260px;overflow-y:auto}
+.unit{display:flex;align-items:center;gap:12px;min-height:48px;padding:6px 12px;border-bottom:1px solid var(--line);font-size:15px;cursor:pointer}
+.unit:last-child{border-bottom:none}
+.unit input{width:22px;height:22px;flex:none;accent-color:var(--accent)}
+.unit[hidden]{display:none}
+.unit.taken{opacity:.5}
+.dayhead{display:flex;justify-content:space-between;align-items:baseline;padding:14px 0 2px;font-size:13px;font-weight:700;color:var(--muted)}
+.cartline{padding:12px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.cartline:last-child{border-bottom:none}
+.cartline .top2{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.cartline .top2 b{overflow-wrap:anywhere}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:6px 0;font-size:14px}
+.kv span:first-child{color:var(--muted)}
+.swatches{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.swatch{border:2px solid var(--line);border-radius:16px;background:var(--surface);padding:10px;display:flex;flex-direction:column;gap:8px;align-items:flex-start;color:var(--ink);min-height:44px}
+.swatch[aria-pressed="true"]{border-color:var(--accent)}
+.swatch .dots{display:flex;gap:4px}
+.swatch .dots i{width:22px;height:22px;border-radius:50%;display:block;border:1px solid rgba(128,128,128,.4)}
+.swatch span{font-size:13px;font-weight:700}
+.qa{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.qa button{min-height:76px;border-radius:18px;border:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:6px;padding:12px 14px;font-weight:700;color:var(--ink);text-align:left}
+.qa button .ci{color:var(--accent)}
+.menulist{display:flex;flex-direction:column}
+.menulist button{display:flex;align-items:center;gap:14px;min-height:60px;border:none;border-bottom:1px solid var(--line);background:transparent;text-align:left;width:100%;padding:8px 0;color:var(--ink)}
+.menulist button:last-child{border-bottom:none}
+.menulist .ci{width:40px;height:40px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+.menulist .grow{flex:1;min-width:0}
+.menulist b{display:block}
+.alert{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
+.alert:last-child{border-bottom:none}
+.alert .dot{flex:none;width:10px;height:10px;border-radius:50%;margin-top:6px}
+.alert .dot.bad{background:var(--bad)}.alert .dot.warn{background:#D98A00}.alert .dot.info{background:var(--accent)}
+.alert .grow{flex:1;min-width:0}
+.alert .grow b{display:block}
+.alert .acts{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.alert .acts button{min-height:44px;padding:0 10px;border:none;background:transparent;color:var(--accent);font-weight:700;font-size:14px}
+.alert .acts button.muted{color:var(--muted);font-weight:600}
+.lockbox{min-height:60vh;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px;overflow-wrap:anywhere}
+.rcpt{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px;overflow-wrap:anywhere}
+.progress{height:8px;border-radius:4px;background:var(--seg);overflow:hidden}
+.progress i{display:block;height:8px;background:var(--accent)}
+@media (prefers-reduced-motion: no-preference){.panel{animation:rise .18s ease-out}@keyframes rise{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}}
+
+/* v3: charcoal, wide headings, custom colors */
+body{background-color:var(--bg)}
+.top h1{font-family:'Unbounded','Inter',sans-serif;text-transform:uppercase;font-weight:700;font-size:21px;letter-spacing:-.01em}
+.card,.flush,.tile{border:1.5px solid var(--line);box-shadow:none}
+.hero{background:var(--surface)!important;border:1.5px solid var(--line);border-radius:24px;box-shadow:none}
+.hero .big{font-weight:700;letter-spacing:-.04em}
+.wk{display:flex;gap:8px;border-top:1px solid var(--line);padding-top:14px}
+.wc{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;color:var(--hero-muted)}
+.wb{width:100%;height:54px;border-radius:8px;background:var(--seg);display:flex;align-items:flex-end;overflow:hidden}
+.wb i{display:block;width:100%;border-radius:8px;background:var(--bar);opacity:.55}.wc.on .wb i{opacity:1}.wc.on{color:var(--hero-ink);font-weight:700}
+.cpick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:6px 0 10px}.cpick label{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted)}
+.cpick input{width:100%;height:46px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);padding:3px}
+html[data-mode="dark"] .tab.add .plus,html[data-mode="dark"] .fab{background:#fff;color:#111}
+
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="sheetRoot"></div>
+<div id="confRoot"></div>
+<nav class="nav" id="nav" aria-label="Main"><div class="in" id="navIn"></div></nav>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<script>
+(function(){
+'use strict';
+window.__REGISTER_SW__=false;
+/* Shop Stock core: constants, helpers, icons, themes, saved data (load, migrate, save), example data, activity log. */
+var KEY='shop-stock.preview', DAY=86400000, storageOK=true;
+var db=null;
+var CATS=['Phones','TVs','Computers','Audio','Accessories','Appliances','Networking','Gaming','Wearables','Cameras','Power'];
+var DEV_CATS=['phone','tv','computer','other'];
+var DEV_CAT_LABEL={phone:'Smartphones',tv:'TVs',computer:'Computers',other:'Others'};
+var PART_TYPES={
+  phone:['Motherboard','Screen','Battery','Speaker','Camera','Charging port','Back cover','Flex cable','Buttons','SIM tray','Other'],
+  tv:['Main board','Power board','T-con board','Backlight strip','Panel','Remote','Speaker','Stand','Other'],
+  computer:['Motherboard','Screen','Battery','Keyboard','RAM','SSD or HDD','Charger','Fan','Charging port','Other'],
+  other:['Motherboard','Power board','Motor','Screen','Speaker','Other']
+};
+var APART_DEFAULTS={
+  phone:[['Motherboard',4],['Screen',3],['Battery',1],['Speaker',1]],
+  tv:[['Main board',3],['Power board',2],['T-con board',1],['Speaker',1]],
+  computer:[['Motherboard',4],['Screen',3],['Battery',1],['Keyboard',1]],
+  other:[['Motherboard',3],['Power board',2],['Other',1]]
+};
+var GRADES={A:'Like new',B:'Good, minor wear',C:'Works, visible wear',D:'Faulty, repairable',E:'Very poor'};
+var METHODS=['Cash','Telebirr','Bank'];
+var EXP_CATS=['Spare parts','Used devices','Transport','Rent','Salaries','Utilities','Other'];
+var STOCK_EXP=['Spare parts','Used devices'];
+var REPAIR_STATUS=['received','diagnosing','waiting','ready','delivered'];
+var REASONS_UNDO=['Wrong item','Wrong price','Customer returned it','Entered twice','Other'];
+var REASONS_DISC=['Customer bargained','Bulk purchase','Small damage','Regular customer','Other'];
+var REASONS_FIX=['Recount','Damaged','Lost or stolen','Returned to supplier','Other'];
+var SLOW_OPTIONS=[7,14,30,45,60,90];
+
+/* ---------- small helpers ---------- */
+var uid=function(){return Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-3);};
+var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
+var fmt=function(n){return Math.round(Number(n)||0).toLocaleString('en-US');};
+var num=function(v){var n=parseFloat(String(v==null?'':v).replace(/,/g,''));return isFinite(n)&&n>0?n:0;};
+var $=function(s){return document.querySelector(s);};
+var clone=function(o){return JSON.parse(JSON.stringify(o));};
+var extend=function(a,b){for(var k in b)if(Object.prototype.hasOwnProperty.call(b,k))a[k]=b[k];return a;};
+var find=function(arr,id){for(var i=0;i<arr.length;i++)if(arr[i].id===id)return arr[i];return null;};
+var cap=function(s){return s.charAt(0).toUpperCase()+s.slice(1);};
+var pad=function(n){return n<10?'0'+n:''+n;};
+var sum=function(arr,f){return arr.reduce(function(a,x){return a+(f(x)||0);},0);};
+var uniq=function(arr){var o={},r=[];arr.forEach(function(x){if(!o[x]){o[x]=1;r.push(x);}});return r;};
+
+/* ---------- dates ---------- */
+var startOfDay=function(ts){var d=new Date(ts);d.setHours(0,0,0,0);return d.getTime();};
+var addDays=function(ts,n){var d=new Date(ts);d.setDate(d.getDate()+n);return d.getTime();};
+var daysSince=function(ts){return Math.floor((Date.now()-ts)/DAY);};
+var isToday=function(ts){return startOfDay(ts)===startOfDay(Date.now());};
+var ymd=function(ts){var d=new Date(ts);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());};
+var fromYmd=function(s){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||'');return m?new Date(+m[1],+m[2]-1,+m[3]).getTime():0;};
+function loc(){return {en:'en-US',am:'am-ET',om:'om-ET'}[db&&db.settings?db.settings.lang:'en']||'en-US';}
+function dfmt(ts,o){try{return new Date(ts).toLocaleDateString(loc(),o);}catch(e){return new Date(ts).toLocaleDateString('en-US',o);}}
+function tfmt(ts){try{return new Date(ts).toLocaleTimeString(loc(),{hour:'numeric',minute:'2-digit'});}catch(e){return new Date(ts).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});}}
+function fmtDate(ts){return dfmt(ts,{month:'short',day:'numeric',year:'numeric'});}
+function dayLabel(ts){
+  var s=startOfDay(ts),t=startOfDay(Date.now());
+  if(s===t)return T('Today');if(s===addDays(t,-1))return T('Yesterday');
+  return dfmt(ts,{weekday:'short',month:'short',day:'numeric'});
+}
+function whenLabel(ts){return isToday(ts)?tfmt(ts):dayLabel(ts)+', '+tfmt(ts);}
+function ageLabel(ts){var d=daysSince(ts);return d<=0?T('today'):T('{n} days',{n:d});}
+function weekStart(ts){var d=new Date(startOfDay(ts)),ws=db.settings.weekStart,diff=(d.getDay()-ws+7)%7;return addDays(d.getTime(),-diff);}
+
+/* ---------- serial numbers and IMEI ---------- */
+function luhn(s){var sum=0,alt=false;for(var i=s.length-1;i>=0;i--){var n=s.charCodeAt(i)-48;if(alt){n*=2;if(n>9)n-=9;}sum+=n;alt=!alt;}return sum%10===0;}
+function mkImei(base14){var s=String(base14),sum=0,alt=true;for(var i=s.length-1;i>=0;i--){var n=s.charCodeAt(i)-48;if(alt){n*=2;if(n>9)n-=9;}sum+=n;alt=!alt;}return s+((10-sum%10)%10);}
+function parseSerials(txt){var seen={},out=[];String(txt||'').split(/[\n,;]+/).forEach(function(x){x=x.trim();if(x&&!seen[x.toLowerCase()]){seen[x.toLowerCase()]=1;out.push(x);}});return out;}
+function serialWarn(s,isPhone){
+  if(!isPhone)return '';
+  if(/^\d+$/.test(s)){if(s.length!==15)return 'len';if(!luhn(s))return 'luhn';}
+  return '';
+}
+function serialInUse(s,ignoreUsedId){
+  s=s.toLowerCase();
+  return db.items.some(function(i){return i.serials.some(function(x){return x.toLowerCase()===s;});})||
+         db.used.some(function(u){return u.id!==ignoreUsedId&&u.status==='stock'&&u.imei&&u.imei.toLowerCase()===s;});
+}
+function analyzeSerials(txt,isPhone,ignoreUsedId){
+  var raw=String(txt||'').split(/[\n,;]+/).map(function(x){return x.trim();}).filter(Boolean),seen={},dupInput=[],list=[],inStock=[],warn=[];
+  raw.forEach(function(x){var k=x.toLowerCase();if(seen[k]){dupInput.push(x);return;}seen[k]=1;list.push(x);if(serialInUse(x,ignoreUsedId))inStock.push(x);var w=serialWarn(x,isPhone);if(w)warn.push({s:x,w:w});});
+  return {list:list,dupInput:dupInput,inStock:inStock,warn:warn};
+}
+
+/* ---------- icons ---------- */
+var ic=function(d,s,w){s=s||24;w=w||1.8;return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+w+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';};
+var I={
+  home:'<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+  box:'<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/>',
+  swap:'<path d="M7 4L3 8l4 4"/><path d="M3 8h14"/><path d="M17 20l4-4-4-4"/><path d="M21 16H7"/>',
+  phone:'<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
+  tv:'<rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/>',
+  laptop:'<rect x="4" y="4" width="16" height="11" rx="1.5"/><path d="M2 19h20"/>',
+  chip:'<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  minus:'<path d="M5 12h14"/>',
+  x:'<path d="M6 6l12 12M18 6L6 18"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+  check:'<path d="M5 13l4 4L19 7"/>',
+  bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/>',
+  menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',
+  wrench:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+  receipt:'<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 8h6M9 12h6"/>',
+  chart:'<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>',
+  trash:'<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>',
+  undo:'<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>',
+  share:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/>',
+  download:'<path d="M12 3v12M7 10l5 5 5-5M4 21h16"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  wallet:'<path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 7l2-3h12"/><circle cx="16.5" cy="13.5" r="1"/>',
+  back:'<path d="M15 18l-6-6 6-6"/>',
+  chev:'<path d="M9 6l6 6-6 6"/>',
+  activity:'<path d="M3 12h4l3-8 4 16 3-8h4"/>',
+  alert:'<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+  users:'<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+  palette:'<path d="M12 3a9 9 0 1 0 0 18c1.2 0 2-.8 2-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4C21 6.5 17 3 12 3z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7" r="1"/>',
+  star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>'
+};
+
+/* ---------- themes: a mode (light or dark) plus a color palette ---------- */
+var MODES={
+  light:{'bg':'#F3F5F7','surface':'#FFFFFF','ink':'#0F1B2D','muted':'#566275','line':'#E1E6EC','field-line':'#8793A6','seg':'#E3E8EE','scrim':'rgba(15,27,45,.5)',
+    'bad':'#B42318','bad-bg':'#FDE7E5','warn':'#7A4100','warn-bg':'#FFEBCF','good':'#0B6150','good-bg':'#E2F3EE',
+    'gA-bg':'#0B6150','gA-fg':'#FFFFFF','gB-bg':'#BFE6DA','gB-fg':'#0B3D33','gC-bg':'#FFE3A3','gC-fg':'#5C3B00','gD-bg':'#F4B58A','gD-fg':'#4A2000','gE-bg':'#D5DAE1','gE-fg':'#243044',
+    'hero-ink':'#FFFFFF','hero-muted':'#C3CCDA','hero-line':'rgba(255,255,255,.2)'},
+  dark:{'bg':'#0B121C','surface':'#131D2B','ink':'#EAF0F7','muted':'#9AA8BB','line':'#243247','field-line':'#62748E','seg':'#1B2738','scrim':'rgba(0,0,0,.65)',
+    'bad':'#FF9A90','bad-bg':'#3A1C1C','warn':'#FFC46B','warn-bg':'#3A2A10','good':'#7FD6C0','good-bg':'#12342C',
+    'gA-bg':'#3CC5A3','gA-fg':'#04231B','gB-bg':'#1F4A40','gB-fg':'#BFE6DA','gC-bg':'#4A3A12','gC-fg':'#FFE3A3','gD-bg':'#55301A','gD-fg':'#F4B58A','gE-bg':'#2A3547','gE-fg':'#C5CEDB',
+    'hero-ink':'#FFFFFF','hero-muted':'#C3CCDA','hero-line':'rgba(255,255,255,.2)'}
+};
+var PALETTES={
+  violet:{name:'Violet',light:{'accent':'#6D4FD8','accent-ink':'#FFFFFF','accent-soft':'#EFEAFC','hero':'#FFFFFF'},dark:{'accent':'#A98BFF','accent-ink':'#14101F','accent-soft':'#2C2640','hero':'#252528'}},
+  teal:{name:'Teal',light:{'accent':'#0E7C66','accent-ink':'#FFFFFF','accent-soft':'#E2F3EE','hero':'#0F1B2D'},dark:{'accent':'#3CC5A3','accent-ink':'#04231B','accent-soft':'#12342C','hero':'#1B2A40'}},
+  ocean:{name:'Ocean',light:{'accent':'#1D5FD1','accent-ink':'#FFFFFF','accent-soft':'#E4EDFC','hero':'#0E2347'},dark:{'accent':'#6AA5FF','accent-ink':'#061631','accent-soft':'#15294D','hero':'#16305C'}},
+  sunset:{name:'Sunset',light:{'accent':'#B4470C','accent-ink':'#FFFFFF','accent-soft':'#FCEBDD','hero':'#3A1A0A'},dark:{'accent':'#FFA05A','accent-ink':'#2A1100','accent-soft':'#43260F','hero':'#47260F'}},
+  forest:{name:'Forest',light:{'accent':'#2E7D32','accent-ink':'#FFFFFF','accent-soft':'#E5F2E5','hero':'#12281A'},dark:{'accent':'#7ED47F','accent-ink':'#0A2A0B','accent-soft':'#173522','hero':'#1B3A26'}},
+  royal:{name:'Royal',light:{'accent':'#6A3FC9','accent-ink':'#FFFFFF','accent-soft':'#EEE8FB','hero':'#1D1240'},dark:{'accent':'#B79BFF','accent-ink':'#1C0B45','accent-soft':'#2A1F55','hero':'#2A1E5C'}},
+  graphite:{name:'Graphite',light:{'accent':'#2B3544','accent-ink':'#FFFFFF','accent-soft':'#E6E9EE','hero':'#11151B'},dark:{'accent':'#D5DBE5','accent-ink':'#0D1117','accent-soft':'#252E3B','hero':'#222A36'}}
+};
+function isDark(){var m=db.settings.mode;return m==='dark'||(m==='auto'&&!!window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);}
+function applyTheme(){
+  var s=db.settings,dk=isDark(),root=document.documentElement,p=PALETTES[s.palette]||PALETTES.teal,vars=extend(extend({},dk?MODES.dark:MODES.light),p[dk?'dark':'light']);
+  if(dk){var B={charcoal:{bg:'#1B1B1D',surface:'#252528',line:'#3A3A3F',seg:'#2F2F33'},black:{bg:'#000000',surface:'#111113',line:'#2A2A2E',seg:'#1A1A1D'},navy:{bg:'#0B0E17',surface:'#141927',line:'#222A3F',seg:'#1B2236'}}[s.bgStyle||'charcoal'];vars.bg=B.bg;vars.surface=B.surface;vars.line=B.line;vars.seg=B.seg;vars.hero=B.surface;}
+  var ac=s.cAccent;if(/^#[0-9a-f]{6}$/i.test(ac||'')){var r=parseInt(ac.substr(1,2),16),g=parseInt(ac.substr(3,2),16),bl=parseInt(ac.substr(5,2),16);vars.accent=ac;vars['accent-ink']=(r*.299+g*.587+bl*.114)>150?'#111111':'#FFFFFF';vars['accent-soft']='rgba('+r+','+g+','+bl+',.18)';}
+  vars.bar=s.cBar||'#6EA8FE';
+  for(var k in vars)root.style.setProperty('--'+k,vars[k]);
+  root.setAttribute('data-mode',dk?'dark':'light');
+  root.setAttribute('data-size',s.textSize==='large'?'large':'normal');
+  root.setAttribute('lang',s.lang==='am'?'am':s.lang==='om'?'om':'en');
+  var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',vars['bg']);
+}
+
+/* ---------- saved data ---------- */
+function defaultSettings(){return {lang:'en',mode:'dark',palette:'violet',ui:3,bgStyle:'charcoal',cAccent:'',cBar:'#6EA8FE',textSize:'normal',slowDays:30,weekStart:1,backupAt:0};}
+function emptyDb(){return {v:2,shop:'',demo:false,settings:defaultSettings(),items:[],used:[],parts:[],sales:[],repairs:[],expenses:[],activity:[],alertsDismissed:{},alertsSeen:{}};}
+function guessDevCat(name,hasImei){
+  var n=String(name||'').toLowerCase();
+  if(/\btv\b|television|"|inch/.test(n)&&!/phone/.test(n))return 'tv';
+  if(/laptop|computer|\bpc\b|macbook|latitude|thinkpad|desktop|notebook/.test(n))return 'computer';
+  return hasImei?'phone':'other';
+}
+function guessPartCat(name,from){
+  var n=String(name||'').toLowerCase();
+  if(/power board|t-con|backlight|remote|main board/.test(n))return 'tv';
+  if(/keyboard|\bram\b|ssd|hdd/.test(n))return 'computer';
+  return from&&from.cat?from.cat:'phone';
+}
+function migrate(o){
+  if(!o||typeof o!=='object'||!Array.isArray(o.items)||!Array.isArray(o.used)||!Array.isArray(o.parts)||!Array.isArray(o.sales))return null;
+  var now=Date.now();
+  ['repairs','expenses','activity'].forEach(function(k){if(!Array.isArray(o[k]))o[k]=[];});
+  o.settings=extend(defaultSettings(),o.settings||{});
+  o.alertsDismissed=o.alertsDismissed||{};o.alertsSeen=o.alertsSeen||{};
+  if(typeof o.shop!=='string')o.shop='';
+  o.items.forEach(function(i){
+    i.serials=i.serials||[];i.qty=i.qty||0;i.cost=i.cost||0;i.price=i.price||0;if(i.reorder==null)i.reorder=5;
+    if(!i.decision)i.decision=i.price>0?'priced':'undecided';if(!i.ts)i.ts=now;
+  });
+  o.used.forEach(function(u){
+    u.buy=u.buy||0;u.ask=u.ask||0;if(!u.ts)u.ts=now;
+    if(!u.cat)u.cat=guessDevCat(u.name,!!u.imei);
+    if(!u.decision)u.decision=u.ask>0?'priced':(u.status==='stock'?'undecided':'priced');
+    if(u.grade==='E'&&u.notes==='Taken apart')u.notes='';
+  });
+  o.parts.forEach(function(p){
+    if(p.qty==null)p.qty=(p.status==='used'||p.status==='gone')?0:1;
+    delete p.status;
+    p.cost=p.cost||0;p.price=p.price||0;if(!p.ts)p.ts=now;
+    if(!p.cat)p.cat=guessPartCat(p.name,find(o.used,p.fromId));
+    if(!p.decision)p.decision=p.price>0?'priced':'undecided';
+  });
+  o.sales.forEach(function(s){
+    if(s.voided==null)s.voided=false;
+    if(!Array.isArray(s.payments))s.payments=[];
+    if(s.discount==null)s.discount=0;
+    if(s.balance==null)s.balance=0;
+    if(s.subtotal==null)s.subtotal=s.price;
+    if(!Array.isArray(s.lines)){
+      s.legacy=true;s.lines=[];
+      if(s.kind==='used'&&s.usedId)s.lines.push({kind:'used',refId:s.usedId,name:s.title,price:s.price,cost:s.price-s.profit,qty:1});
+      else if(s.kind==='trade'&&s.itemId){s.lines.push({kind:'new',refId:s.itemId,name:s.title,serial:'',qty:1,price:s.price,cost:s.price-s.profit});}
+      else if(s.kind==='new'&&s.itemId){var m=/ x(\d+)/.exec(s.title||'');var q=m?parseInt(m[1],10):1;s.lines.push({kind:'new',refId:s.itemId,name:s.title,serial:'',qty:q,price:q?s.price/q:s.price,cost:q?(s.price-s.profit)/q:0});}
+      if(s.kind==='trade'&&s.usedId)s.trade={usedId:s.usedId,value:s.value||0};
+    }
+  });
+  o.v=2;return o;
+}
+function load(){
+  try{
+    var s=localStorage.getItem(KEY);
+    if(s){
+      var o=JSON.parse(s);
+      if(o&&o.v!==2){try{localStorage.setItem(KEY+'.before-v2',s);}catch(e){}}
+      var m=migrate(o);if(m){m.settings=Object.assign(defaultSettings(),m.settings||{});if(m.settings.ui!==3){m.settings.ui=3;m.settings.palette='violet';m.settings.mode='dark';m.settings.bgStyle='charcoal';}return m;}
+    }
+  }catch(e){storageOK=false;}
+  return null;
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db));}catch(e){storageOK=false;}}
+
+/* ---------- activity log (stored as a key plus values so it can be shown in any language) ---------- */
+function log(type,k,v,ts){
+  db.activity.push({id:uid(),ts:ts||Date.now(),type:type,k:k,v:v||{}});
+  if(db.activity.length>5000)db.activity.splice(0,db.activity.length-5000);
+}
+
+/* ---------- example data ---------- */
+function seed(){
+  var t=Date.now(),ago=function(d){return t-d*DAY;},mins=function(m){return t-m*60000;},o=emptyDb();
+  o.demo=true;
+  var imei=function(n){return mkImei('35693803'+String(100000+n*7919).slice(-6));};
+  var mark=function(a){a.forEach(function(x){x.demo=true;});return a;};
+  var snapItem=function(i){return {name:i.name,cat:i.cat,track:i.track,price:i.price,cost:i.cost,reorder:i.reorder,decision:i.decision};};
+  o.items=mark([
+    {id:'i1',name:'Samsung 55" TV',cat:'TVs',track:'serial',price:31500,cost:26000,reorder:3,serials:['TV55-7781','TV55-7782'],qty:0,decision:'priced',ts:ago(40)},
+    {id:'i2',name:'iPhone 15 128GB',cat:'Phones',track:'serial',price:78000,cost:70500,reorder:2,serials:[imei(1),imei(2),imei(3),imei(4),imei(5),imei(6)],qty:0,decision:'priced',ts:ago(30)},
+    {id:'i3',name:'Phone charger 20W',cat:'Accessories',track:'qty',price:650,cost:400,reorder:10,serials:[],qty:4,decision:'priced',ts:ago(20)},
+    {id:'i4',name:'JBL Flip 6',cat:'Audio',track:'serial',price:9800,cost:8200,reorder:2,serials:['JBL-5522','JBL-5523','JBL-5524'],qty:0,decision:'priced',ts:ago(15)},
+    {id:'i5',name:'HDMI cable 2m',cat:'Accessories',track:'qty',price:250,cost:120,reorder:10,serials:[],qty:38,decision:'priced',ts:ago(60)},
+    {id:'i6',name:'Wireless mouse',cat:'Accessories',track:'qty',price:0,cost:180,reorder:5,serials:[],qty:12,decision:'undecided',ts:ago(5)}
+  ]);
+  o.used=mark([
+    {id:'u1',name:'iPhone 13 128GB',cat:'phone',imei:imei(11),grade:'A',buy:38000,ask:46000,decision:'priced',notes:'Battery health 91%',status:'stock',ts:ago(12),source:'trade-in'},
+    {id:'u2',name:'Samsung A54',cat:'phone',imei:imei(12),grade:'B',buy:14000,ask:18500,decision:'priced',notes:'Small scratch on screen',status:'stock',ts:ago(21),source:'trade-in'},
+    {id:'u3',name:'Tecno Spark 10',cat:'phone',imei:imei(13),grade:'C',buy:4500,ask:6500,decision:'priced',notes:'Back cover cracked',status:'stock',ts:ago(45),source:'purchase'},
+    {id:'u4',name:'LG 43" TV',cat:'tv',imei:'LG43-90017',grade:'D',buy:5000,ask:9000,decision:'priced',notes:'Panel fault, lines on the left',status:'stock',ts:ago(30),source:'purchase'},
+    {id:'u5',name:'Redmi 9',cat:'phone',imei:imei(14),grade:'E',buy:1200,ask:0,decision:'undecided',notes:'Dead. Not sure if I will sell it or take it apart.',status:'stock',ts:ago(60),source:'purchase'},
+    {id:'u6',name:'Infinix Hot 11',cat:'phone',imei:imei(15),grade:'E',buy:3000,ask:0,decision:'priced',notes:'',status:'parts',ts:ago(9),partedAt:ago(3),source:'purchase'},
+    {id:'u7',name:'LG 32" TV',cat:'tv',imei:'LG32-44120',grade:'B',buy:4000,ask:0,decision:'undecided',notes:'Customer: Dawit',status:'stock',ts:mins(20),source:'trade-in',tradeSaleId:'s3'},
+    {id:'u8',name:'Dell Latitude 5420',cat:'computer',imei:'DL5420-8831',grade:'C',buy:12000,ask:16000,decision:'priced',notes:'Needs a new battery',status:'stock',ts:ago(8),source:'purchase'},
+    {id:'u9',name:'Samsung A32',cat:'phone',imei:imei(16),grade:'B',buy:8500,ask:12000,decision:'priced',notes:'',status:'sold',ts:ago(20),soldPrice:12000,soldAt:ago(1),source:'purchase',saleId:'s4'}
+  ]);
+  o.parts=mark([
+    {id:'p1',name:'Motherboard',cat:'phone',state:'tested',cost:1400,price:0,decision:'undecided',qty:1,from:'Infinix Hot 11',fromId:'u6',ts:ago(3)},
+    {id:'p2',name:'Screen',cat:'phone',state:'tested',cost:1000,price:1800,decision:'priced',qty:1,from:'Infinix Hot 11',fromId:'u6',ts:ago(3)},
+    {id:'p3',name:'Speaker',cat:'phone',state:'untested',cost:200,price:0,decision:'undecided',qty:1,from:'Infinix Hot 11',fromId:'u6',ts:ago(3)},
+    {id:'p4',name:'Battery',cat:'phone',state:'faulty',cost:400,price:0,decision:'undecided',qty:1,from:'Infinix Hot 11',fromId:'u6',ts:ago(3)},
+    {id:'p5',name:'Power board',cat:'tv',state:'tested',cost:900,price:1500,decision:'priced',qty:1,from:'Bought directly',fromId:'',ts:ago(14)},
+    {id:'p6',name:'Charging port',cat:'phone',state:'tested',cost:80,price:200,decision:'priced',qty:5,from:'Bought directly',fromId:'',ts:ago(14)},
+    {id:'p7',name:'Remote',cat:'tv',state:'tested',cost:50,price:120,decision:'priced',qty:3,from:'Bought directly',fromId:'',ts:ago(10)}
+  ]);
+  var it=function(id){return find(o.items,id);};
+  o.sales=mark([
+    {id:'s1',ts:mins(95),kind:'new',title:'Phone charger 20W x2',lines:[{kind:'new',refId:'i3',name:'Phone charger 20W',serial:'',qty:2,price:650,cost:400,snap:snapItem(it('i3'))}],subtotal:1300,discount:0,price:1300,cash:1300,balance:0,payments:[],profit:500,method:'Cash',customer:'',phone:'',voided:false},
+    {id:'s2',ts:mins(55),kind:'new',title:'JBL Flip 6',lines:[{kind:'new',refId:'i4',name:'JBL Flip 6',serial:'JBL-5521',qty:1,price:9800,cost:8200,snap:snapItem(it('i4'))}],subtotal:9800,discount:0,price:9800,cash:9800,balance:0,payments:[],profit:1600,method:'Telebirr',customer:'',phone:'',voided:false},
+    {id:'s3',ts:mins(20),kind:'trade',title:'Samsung 55" TV for LG 32" TV',lines:[{kind:'new',refId:'i1',name:'Samsung 55" TV',serial:'TV55-7780',qty:1,price:31500,cost:26000,snap:snapItem(it('i1'))}],trade:{usedId:'u7',value:4000,name:'LG 32" TV'},subtotal:31500,discount:0,price:31500,cash:27500,balance:0,payments:[],profit:5500,method:'Cash',customer:'Dawit',phone:'',voided:false},
+    {id:'s4',ts:ago(1),kind:'used',title:'Samsung A32 (used)',lines:[{kind:'used',refId:'u9',name:'Samsung A32 (used)',serial:imei(16),qty:1,price:12000,cost:8500}],subtotal:12000,discount:0,price:12000,cash:12000,balance:0,payments:[],profit:3500,method:'Cash',customer:'',phone:'',voided:false},
+    {id:'s5',ts:ago(3),kind:'new',title:'HDMI cable 2m x4',lines:[{kind:'new',refId:'i5',name:'HDMI cable 2m',serial:'',qty:4,price:250,cost:120,snap:snapItem(it('i5'))}],subtotal:1000,discount:0,price:1000,cash:400,balance:600,payments:[],profit:520,method:'Cash',customer:'Hana',phone:'0911000000',voided:false},
+    {id:'s6',ts:mins(200),kind:'repair',title:'Repair: Tecno Spark 8',lines:[{kind:'repair',refId:'r3',name:'Repair: Tecno Spark 8',qty:1,price:1500,cost:80}],subtotal:1500,discount:0,price:1500,cash:1500,balance:0,payments:[],profit:1420,method:'Cash',customer:'Sara',phone:'',voided:false}
+  ]);
+  o.repairs=mark([
+    {id:'r1',ts:ago(7),customer:'Ahmed',phone:'0912000001',device:'Samsung A12',imei:'',problem:'Cracked screen',estimate:2500,status:'ready',readyAt:ago(5),parts:[],otherCost:0,notes:''},
+    {id:'r2',ts:ago(2),customer:'Tigist',phone:'0912000002',device:'LG 43" TV',imei:'',problem:'No power',estimate:1800,status:'waiting',parts:[],otherCost:0,notes:'Waiting for a power board'},
+    {id:'r3',ts:mins(260),customer:'Sara',phone:'',device:'Tecno Spark 8',imei:'',problem:'Not charging',estimate:1500,status:'delivered',deliveredAt:mins(200),fee:1500,method:'Cash',saleId:'s6',parts:[{partId:'p6',name:'Charging port',cat:'phone',qty:1,cost:80}],otherCost:0,notes:''}
+  ]);
+  o.expenses=mark([
+    {id:'e1',ts:mins(150),amount:150,cat:'Transport',note:'Taxi to the supplier',method:'Cash',ref:null},
+    {id:'e2',ts:ago(8),amount:12000,cat:'Used devices',note:'Dell Latitude 5420',method:'Cash',ref:{t:'used',id:'u8'}},
+    {id:'e3',ts:ago(1),amount:800,cat:'Utilities',note:'Electricity',method:'Cash',ref:null}
+  ]);
+  o.activity=mark([
+    {id:'a1',ts:mins(20),type:'trade',k:'Trade-in: {a} came in for {b}',v:{a:'LG 32" TV',b:'Samsung 55" TV'}},
+    {id:'a2',ts:mins(55),type:'sale',k:'Sale recorded: {t} for {p} Birr',v:{t:'JBL Flip 6',p:fmt(9800)}},
+    {id:'a3',ts:mins(95),type:'sale',k:'Sale recorded: {t} for {p} Birr',v:{t:'Phone charger 20W x2',p:fmt(1300)}},
+    {id:'a4',ts:ago(1),type:'sale',k:'Sale recorded: {t} for {p} Birr',v:{t:'Samsung A32 (used)',p:fmt(12000)}}
+  ]);
+  return o;
+}
+
+/* ---------- app state (not saved) ---------- */
+function freshCart(){return {lines:[],customer:'',phone:'',discount:'',reason:'',method:'Cash',paid:''};}
+function freshTrade(m){return {customer:'',name:'',imei:'',cat:'phone',grade:'B',value:'',ask:'',itemId:'',serial:'',price:'',method:m||'Cash'};}
+var state={tab:'home',stockTab:'new',pages:[],sheet:null,conf:null,f:{},fresh:false,armed:null,
+  q:'',newCat:'All',usedGrade:'All',usedStatus:'stock',usedQ:'',partCat:null,partType:'All',partStatus:'stock',partQ:'',
+  salesPeriod:'today',salesDate:'',salesFrom:'',salesTo:'',salesQ:'',salesVoid:false,
+  repairFilter:'open',repairQ:'',expDate:'',actFilter:'all',actQ:'',debtQ:'',
+  cart:freshCart(),trade:freshTrade(),tradeDone:null,apart:null,pickTab:'new'};
+
+/* Shop Stock translations. English is the key itself; other languages are looked up by that key. */
+var DICT={am:{},om:{}};
+function T(k,v){
+  if(k==null)return '';
+  var l=db&&db.settings?db.settings.lang:'en',s=String(k);
+  if(l!=='en'&&DICT[l]&&DICT[l][s]!=null)s=DICT[l][s];
+  if(v)s=s.replace(/\{(\w+)\}/g,function(m,n){return v[n]!=null?v[n]:m;});
+  return s;
+}
+
+/* Shop Stock UI helpers: small HTML builders shared by screens and sheets. */
+function getPath(o,path){var p=path.split('.');for(var i=0;i<p.length&&o!=null;i++)o=o[p[i]];return o;}
+function setPath(o,path,v){var p=path.split('.');for(var i=0;i<p.length-1;i++)o=o[p[i]];o[p[p.length-1]]=v;}
+function F(id,def){var v=state.f[id];return v==null?(def==null?'':def):v;}
+var tagHtml=function(t){return '<span class="tag '+t.k+'">'+esc(t.t)+'</span>';};
+var tag=function(t,k){return '<span class="tag '+k+'">'+esc(t)+'</span>';};
+function tagsHtml(list){return list.length?'<span class="tags">'+list.map(tagHtml).join('')+'</span>':'';}
+
+/* form fields. If o.b is given the value lives at that path in state, otherwise in state.f under the field id. */
+function fInput(id,label,o){
+  o=o||{};
+  var val=o.b?getPath(state,o.b):F(id,o.def);
+  return '<label class="field'+(o.cls?' '+o.cls:'')+'" for="'+id+'"'+(o.hid?' hidden':'')+'>'+esc(label)+
+    '<input id="'+id+'" '+(o.b?'data-b="'+o.b+'"':'data-f')+(o.type?' type="'+o.type+'"':'')+(o.im?' inputmode="'+o.im+'"':'')+(o.list?' list="'+o.list+'"':'')+(o.ph?' placeholder="'+esc(o.ph)+'"':'')+(o.max?' max="'+o.max+'"':'')+' autocomplete="off" value="'+esc(val==null?'':val)+'"'+(o.live?' data-live="'+o.live+'"':'')+'>'+
+    (o.hint?'<small>'+esc(o.hint)+'</small>':'')+'</label>';
+}
+function fSelect(id,label,opts,o){
+  o=o||{};
+  var val=o.b?getPath(state,o.b):F(id,o.def);
+  return '<label class="field" for="'+id+'"'+(o.hid?' hidden':'')+'>'+esc(label)+'<select id="'+id+'" '+(o.b?'data-b="'+o.b+'"':'data-f')+(o.live?' data-live="'+o.live+'"':'')+'>'+
+    opts.map(function(x){return '<option value="'+esc(x.v)+'"'+(String(x.v)===String(val)?' selected':'')+'>'+esc(x.t)+'</option>';}).join('')+'</select></label>';
+}
+function fArea(id,label,o){
+  o=o||{};
+  return '<label class="field" for="'+id+'"><span>'+esc(label)+'</span><textarea id="'+id+'" data-f'+(o.ph?' placeholder="'+esc(o.ph)+'"':'')+(o.live?' data-live="'+o.live+'"':'')+(o.ro?' readonly':'')+'>'+esc(o.b?getPath(state,o.b):F(id,o.def))+'</textarea>'+(o.hint?'<small>'+esc(o.hint)+'</small>':'')+'</label>';
+}
+function segHtml(opts,cur,action,extra){
+  return '<div class="seg" role="group">'+opts.map(function(o){return '<button type="button" data-a="'+action+'" data-v="'+esc(o.v)+'"'+(extra||'')+' aria-pressed="'+(String(cur)===String(o.v))+'">'+esc(o.t)+'</button>';}).join('')+'</div>';
+}
+function chipsRow(opts,cur,action){
+  return '<div class="chips" role="group">'+opts.map(function(o){return '<button type="button" class="chip" data-a="'+action+'" data-v="'+esc(o.v)+'" aria-pressed="'+(String(cur)===String(o.v))+'">'+esc(o.t)+'</button>';}).join('')+'</div>';
+}
+function searchBox(id,ph,val,live){
+  return '<label class="search">'+ic(I.search,20)+'<input id="'+id+'" type="search" placeholder="'+esc(ph)+'" aria-label="'+esc(ph)+'" value="'+esc(val)+'" data-live="'+live+'" autocomplete="off"></label>';
+}
+function topbar(title,sub,right){return '<header class="top"><div><h1>'+esc(title)+'</h1>'+(sub?'<p class="sub">'+esc(sub)+'</p>':'')+'</div>'+(right?'<div class="acts">'+right+'</div>':'')+'</header>';}
+function pagehead(title,right){return '<header class="pagehead"><button class="iconbtn" data-a="back" aria-label="'+esc(T('Back'))+'">'+ic(I.back,22,2)+'</button><h1>'+esc(title)+'</h1>'+(right||'')+'</header>';}
+function addBtn(action,label,v){return '<button class="iconbtn primary" data-a="'+action+'"'+(v?' data-v="'+v+'"':'')+' aria-label="'+esc(label)+'">'+ic(I.plus,22,2.2)+'</button>';}
+function iconBtn(action,icon,label,extra,v){return '<button class="iconbtn" data-a="'+action+'"'+(v?' data-v="'+esc(v)+'"':'')+' aria-label="'+esc(label)+'">'+ic(icon,22)+(extra||'')+'</button>';}
+function methodOpts(){return METHODS.map(function(m){return {v:m,t:T(m)};});}
+function optsFrom(list){return list.map(function(x){return {v:x,t:T(x)};});}
+function errBox(){return '<p class="err" id="sheetErr" role="alert" hidden></p>';}
+function okSteps(list){return '<div class="steps">'+list.map(function(s){return '<div>'+ic(I.check,18,2.4)+'<span>'+esc(s)+'</span></div>';}).join('')+'</div>';}
+function emptyMsg(t){return '<p class="empty">'+esc(t)+'</p>';}
+function kv(k,v){return '<div class="kv"><span>'+esc(k)+'</span><span>'+v+'</span></div>';}
+function priceText(price,decision){
+  if(decision==='parts')return '<b>'+esc(T('For parts'))+'</b>';
+  if(!price)return '<b>'+esc(T('Undecided'))+'</b>';
+  return '<b class="num">'+fmt(price)+'</b>';
+}
+function decisionTag(decision,price){
+  if(decision==='parts')return tag(T('For parts'),'gray');
+  if(!price||decision==='undecided')return tag(T('Undecided'),'warn');
+  return '';
+}
+function partCatIcon(c){return c==='tv'?I.tv:c==='computer'?I.laptop:c==='phone'?I.phone:I.chip;}
+
+/* Shop Stock logic: stock numbers, sales, trade-ins, taking devices apart, undo, repairs, expenses, alerts, receipts, CSV. */
+
+/* ---------- stock numbers ---------- */
+var stock=function(i){return i.track==='serial'?i.serials.length:i.qty;};
+var isLow=function(i){return i.decision!=='parts'&&stock(i)<=i.reorder;};
+var slowDays=function(){return db.settings.slowDays||30;};
+function lastSaleTs(itemId){var m=0;db.sales.forEach(function(s){if(s.voided)return;s.lines.forEach(function(l){if(l.kind==='new'&&l.refId===itemId&&s.ts>m)m=s.ts;});});return m;}
+function idleSince(i){return Math.max(i.ts||0,lastSaleTs(i.id));}
+function slowUsed(){return db.used.filter(function(u){return u.status==='stock'&&daysSince(u.ts)>=slowDays();}).sort(function(a,b){return a.ts-b.ts;});}
+function slowNew(){return db.items.filter(function(i){return stock(i)>0&&i.decision!=='parts'&&daysSince(idleSince(i))>=slowDays();}).sort(function(a,b){return idleSince(a)-idleSince(b);});}
+function slowParts(){return db.parts.filter(function(p){return p.qty>0&&daysSince(p.ts)>=slowDays();}).sort(function(a,b){return a.ts-b.ts;});}
+var undecidedNew=function(){return db.items.filter(function(i){return i.decision==='undecided';});};
+var undecidedUsed=function(){return db.used.filter(function(u){return u.status==='stock'&&u.decision==='undecided';});};
+var undecidedParts=function(){return db.parts.filter(function(p){return p.qty>0&&p.decision==='undecided';});};
+var usedInStock=function(){return db.used.filter(function(u){return u.status==='stock';});};
+var partsInStock=function(){return db.parts.filter(function(p){return p.qty>0;});};
+var partUnits=function(list){return sum(list,function(p){return p.qty;});};
+
+/* ---------- sales: titles, tags, totals ---------- */
+function lineLabel(l){
+  var n=l.name;
+  if(l.kind==='used')n+=' ('+T('used')+')';
+  else if(l.kind==='part')n=T(l.name)+' ('+T('part')+')';
+  if(l.qty>1)n+=' x'+l.qty;
+  return n;
+}
+function saleTitle(s){
+  if(s.legacy)return s.title||'';
+  if(s.lines.length&&s.lines[0].kind==='repair')return T('Repair: {d}',{d:s.lines[0].name});
+  if(s.trade&&s.lines.length)return T('{a} for {b}',{a:s.lines[0].name,b:s.trade.name||''});
+  var ls=s.lines.map(lineLabel);
+  if(ls.length<=2)return ls.join(' + ');
+  return ls[0]+' '+T('+{n} more',{n:ls.length-1});
+}
+function saleTags(s){
+  var t=[];
+  if(s.voided)t.push({t:T('Reversed'),k:'bad'});
+  if(s.trade)t.push({t:T('Trade-in'),k:'info'});
+  else if(s.lines.length===1&&s.lines[0].kind==='repair')t.push({t:T('Repair'),k:'info'});
+  else if(s.lines.length&&s.lines.every(function(l){return l.kind==='used';}))t.push({t:T('Used'),k:'gray'});
+  else if(s.lines.length&&s.lines.every(function(l){return l.kind==='part';}))t.push({t:T('Part'),k:'gray'});
+  if(s.discount>0)t.push({t:T('Discount'),k:'warn'});
+  if(!s.voided&&s.balance>0)t.push({t:T('Owes {n}',{n:fmt(s.balance)}),k:'warn'});
+  if(!s.voided&&saleBelowCost(s))t.push({t:T('Below cost'),k:'bad'});
+  return t;
+}
+function saleBelowCost(s){return !s.trade&&s.lines.some(function(l){return l.kind!=='repair'&&l.cost>0&&l.price<l.cost;});}
+function saleMatches(s,q){
+  q=q.trim().toLowerCase();if(!q)return true;
+  var hay=[saleTitle(s),s.customer,s.phone,s.method,s.kind,s.discountReason,fmt(s.price)].concat(s.lines.map(function(l){return l.name+' '+(l.serial||'');})).join(' ').toLowerCase();
+  return q.split(/\s+/).every(function(w){return hay.indexOf(w)>=0;});
+}
+function salesBetween(a,b,withVoid){return db.sales.filter(function(s){return s.ts>=a&&s.ts<b&&(withVoid||!s.voided);}).sort(function(x,y){return y.ts-x.ts;});}
+function cashInBetween(a,b){
+  var c=0;
+  db.sales.forEach(function(s){if(s.voided)return;if(s.ts>=a&&s.ts<b)c+=s.cash||0;(s.payments||[]).forEach(function(p){if(p.ts>=a&&p.ts<b)c+=p.amount;});});
+  return c;
+}
+function totalsFor(list,a,b){return {value:sum(list,function(s){return s.price;}),profit:sum(list,function(s){return s.profit;}),count:list.length,cash:cashInBetween(a,b),owed:sum(list,function(s){return s.balance;})};}
+function periodRange(p){
+  var t=startOfDay(Date.now());
+  if(p==='today')return [t,addDays(t,1)];
+  if(p==='yesterday')return [addDays(t,-1),t];
+  if(p==='week'){var w=weekStart(Date.now());return [w,addDays(w,7)];}
+  if(p==='date'){var d=fromYmd(state.salesDate)||t;return [d,addDays(d,1)];}
+  var f=fromYmd(state.salesFrom)||t,e=fromYmd(state.salesTo)||f;if(e<f){var x=f;f=e;e=x;}
+  return [f,addDays(e,1)];
+}
+function periodLabel(p){
+  var r=periodRange(p);
+  if(p==='today')return T('Today');if(p==='yesterday')return T('Yesterday');
+  if(p==='week')return T('This week');
+  if(p==='date')return fmtDate(r[0]);
+  return fmtDate(r[0])+' - '+fmtDate(r[1]-DAY);
+}
+function expensesBetween(a,b){return db.expenses.filter(function(e){return e.ts>=a&&e.ts<b;}).sort(function(x,y){return y.ts-x.ts;});}
+function debtList(){return db.sales.filter(function(s){return !s.voided&&s.balance>0;}).sort(function(a,b){return a.ts-b.ts;});}
+
+/* ---------- selling: the cart ---------- */
+function cartTotals(c){
+  var sub=sum(c.lines,function(l){return num(l.price)*l.qty;});
+  var disc=Math.min(num(c.discount),sub),total=sub-disc,raw=String(c.paid==null?'':c.paid).trim();
+  var paid=raw===''?total:Math.max(0,Math.min(parseFloat(raw.replace(/,/g,''))||0,total));
+  return {sub:sub,disc:disc,total:total,paid:paid,balance:total-paid};
+}
+function lineRef(l){
+  if(l.kind==='new')return find(db.items,l.refId);
+  if(l.kind==='used')return find(db.used,l.refId);
+  return find(db.parts,l.refId);
+}
+function cartError(c){
+  if(!c.lines.length)return T('Add at least one item to the sale.');
+  var tot=cartTotals(c),taken={};
+  for(var i=0;i<c.lines.length;i++){
+    var l=c.lines[i],r=lineRef(l),nm=l.name;
+    if(!r)return T('{n} is no longer in stock.',{n:nm});
+    if(l.kind==='new'){
+      if(r.track==='serial'){
+        if(!l.serial)return T('Choose the IMEI or serial number for {n}.',{n:nm});
+        if(r.serials.indexOf(l.serial)<0)return T('{n} is no longer in stock.',{n:nm+' ('+l.serial+')'});
+        if(taken[l.serial])return T('The same unit is in the sale twice: {n}.',{n:l.serial});
+        taken[l.serial]=1;
+      }else if(l.qty>r.qty)return T('Only {n} left in stock for {i}.',{n:r.qty,i:nm});
+    }else if(l.kind==='used'){if(r.status!=='stock')return T('{n} is no longer in stock.',{n:nm});}
+    else if(l.kind==='part'){if(l.qty>r.qty)return T('Only {n} left in stock for {i}.',{n:r.qty,i:nm});}
+    if(num(l.price)<=0)return T('Enter a price for {n}.',{n:nm});
+  }
+  if(tot.disc>0&&!c.reason)return T('Choose a reason for the discount.');
+  if(tot.balance>0&&!String(c.customer||'').trim())return T('Add the customer name when part of the payment is still owed.');
+  return '';
+}
+function snapItem(i){return {name:i.name,cat:i.cat,track:i.track,price:i.price,cost:i.cost,reorder:i.reorder,decision:i.decision};}
+function recordSale(){
+  var c=state.cart,err=cartError(c);if(err)return {err:err};
+  var now=Date.now(),id=uid(),tot=cartTotals(c),lines=[];
+  c.lines.forEach(function(l){
+    var line={kind:l.kind,refId:l.refId,name:l.name,serial:l.serial||'',qty:l.qty,price:num(l.price),cost:0},r=lineRef(l);
+    if(l.kind==='new'){
+      line.cost=r.cost;line.snap=snapItem(r);
+      if(r.track==='serial')r.serials.splice(r.serials.indexOf(l.serial),1);else r.qty-=l.qty;
+    }else if(l.kind==='used'){
+      line.cost=r.buy;line.serial=r.imei||'';line.snap=clone(r);
+      r.status='sold';r.soldPrice=line.price;r.soldAt=now;r.saleId=id;
+    }else{
+      line.cost=r.cost;line.snap=clone(r);r.qty-=l.qty;
+    }
+    lines.push(line);
+  });
+  var cost=sum(lines,function(l){return l.cost*l.qty;});
+  var sale={id:id,ts:now,kind:lines.length===1?lines[0].kind:'sale',lines:lines,subtotal:tot.sub,discount:tot.disc,discountReason:tot.disc>0?c.reason:'',price:tot.total,cash:tot.paid,balance:tot.balance,payments:[],profit:tot.total-cost,method:c.method,customer:String(c.customer||'').trim(),phone:String(c.phone||'').trim(),voided:false};
+  db.sales.push(sale);
+  log('sale','Sale recorded: {t} for {p} Birr',{t:saleTitle(sale),p:fmt(sale.price)},now);
+  if(tot.disc>0)log('sale','Discount of {d} Birr given on {t} ({r})',{d:fmt(tot.disc),t:saleTitle(sale),r:c.reason},now);
+  if(tot.balance>0)log('money','{c} owes {n} Birr for {t}',{c:sale.customer,n:fmt(tot.balance),t:saleTitle(sale)},now);
+  state.cart=freshCart();save();
+  return {sale:sale};
+}
+function addPayment(s,amount,method){
+  amount=Math.min(amount,s.balance);if(amount<=0)return false;
+  s.payments.push({id:uid(),ts:Date.now(),amount:amount,method:method});s.balance-=amount;
+  log('money','Payment of {n} Birr received from {c} for {t}',{n:fmt(amount),c:s.customer||T('a customer'),t:saleTitle(s)});save();return true;
+}
+
+/* ---------- trade-ins ---------- */
+function tradeCalc(){
+  var t=state.trade,it=find(db.items,t.itemId),price=num(t.price),value=num(t.value),miss=[];
+  if(!t.name.trim())miss.push(T("the customer's device"));
+  if(!it)miss.push(T('the new device'));
+  else if(it.track==='serial'&&!t.serial)miss.push(T('which unit they take'));
+  if(!value)miss.push(T('the trade-in value'));
+  if(!price&&it)miss.push(T('the selling price'));
+  return {it:it,price:price,value:value,diff:price-value,miss:miss};
+}
+function recordTrade(){
+  var c=tradeCalc(),t=state.trade;if(c.miss.length)return {err:T('Still needed: {n}.',{n:c.miss.join(', ')})};
+  var it=c.it,now=Date.now();
+  if(it.track==='serial'){var ix=it.serials.indexOf(t.serial);if(ix<0)return {err:T('That unit is no longer in stock.')};}
+  else if(it.qty<1)return {err:T('{n} is no longer in stock.',{n:it.name})};
+  var imei=t.imei.trim();
+  if(imei&&serialInUse(imei))return {err:T('That IMEI or serial number is already in your stock: {n}',{n:imei})};
+  var sid=uid(),did=uid(),ask=num(t.ask);
+  var line={kind:'new',refId:it.id,name:it.name,serial:t.serial||'',qty:1,price:c.price,cost:it.cost,snap:snapItem(it)};
+  if(it.track==='serial')it.serials.splice(it.serials.indexOf(t.serial),1);else it.qty-=1;
+  var dev={id:did,name:t.name.trim(),cat:t.cat,imei:imei,grade:t.grade,buy:c.value,ask:ask,decision:ask>0?'priced':'undecided',notes:t.customer.trim()?T('Customer: {n}',{n:t.customer.trim()}):'',status:'stock',ts:now,source:'trade-in',tradeSaleId:sid};
+  db.used.push(dev);
+  var sale={id:sid,ts:now,kind:'trade',lines:[line],trade:{usedId:did,value:c.value,name:dev.name},subtotal:c.price,discount:0,price:c.price,cash:c.diff,balance:0,payments:[],profit:c.price-it.cost,method:t.method,customer:t.customer.trim(),phone:'',voided:false};
+  db.sales.push(sale);
+  log('trade','Trade-in: {a} came in for {b}',{a:dev.name,b:it.name},now);
+  save();return {sale:sale,dev:dev};
+}
+
+/* ---------- undo (reverse a sale, undo a take-apart). All steps are collected so they can be previewed first. ---------- */
+function removeUsed(d){
+  db.used=db.used.filter(function(u){return u.id!==d.id;});
+  db.expenses=db.expenses.filter(function(e){return !(e.ref&&e.ref.t==='used'&&e.ref.id===d.id);});
+}
+function syncRepairSale(r){
+  if(!r.saleId)return;var s=find(db.sales,r.saleId);if(!s||!s.lines.length)return;
+  var cost=sum(r.parts,function(p){return p.qty*p.cost;})+(r.otherCost||0);
+  s.lines[0].cost=cost;s.profit=s.price-cost;
+}
+function reverseSale(s,ctx){
+  if(!s||s.voided||ctx.seen[s.id])return;
+  ctx.seen[s.id]=1;var S=ctx.steps;
+  S.push(T('Reverse the sale: {t}',{t:saleTitle(s)}));
+  if(s.trade){
+    var d=find(db.used,s.trade.usedId);
+    if(d){
+      if(d.status==='sold'){
+        var s2=null;db.sales.forEach(function(x){if(!s2&&!x.voided&&x!==s&&x.lines.some(function(l){return l.kind==='used'&&l.refId===d.id;}))s2=x;});
+        if(s2)reverseSale(s2,ctx);else d.status='stock';
+      }
+      if(d.status==='parts')undoTakeApart(d,ctx);
+      S.push(T('Remove {n} from used stock',{n:d.name}));removeUsed(d);
+    }
+  }
+  s.lines.forEach(function(l){
+    if(l.kind==='new'){
+      var it=find(db.items,l.refId);
+      if(!it){it=extend({id:l.refId,serials:[],qty:0,ts:Date.now()},l.snap||{name:l.name,cat:'Accessories',track:l.serial?'serial':'qty',price:l.price,cost:l.cost,reorder:5,decision:'priced'});db.items.push(it);S.push(T('Create {n} again (it had been deleted)',{n:it.name}));}
+      if(it.track==='serial'){
+        if(l.serial){if(serialInUse(l.serial))S.push(T('{n} is already in stock again, so it is not added twice',{n:l.serial}));else{it.serials.push(l.serial);S.push(T('Put {n} back in stock',{n:it.name+' ('+l.serial+')'}));}}
+        else S.push(T('The IMEI of {n} was not saved in this older sale. Add it again with Add stock.',{n:it.name}));
+      }else{it.qty+=l.qty;S.push(T('Put {n} back in stock',{n:it.name+' x'+l.qty}));}
+    }else if(l.kind==='used'){
+      var d2=find(db.used,l.refId);
+      if(!d2&&l.snap){d2=clone(l.snap);db.used.push(d2);}
+      if(d2){d2.status='stock';delete d2.soldPrice;delete d2.soldAt;delete d2.saleId;S.push(T('Put {n} back in used stock',{n:d2.name}));}
+    }else if(l.kind==='part'){
+      var p=find(db.parts,l.refId);
+      if(!p&&l.snap){p=clone(l.snap);p.qty=0;db.parts.push(p);}
+      if(p){p.qty+=l.qty;S.push(T('Put {n} back in spare parts',{n:T(p.name)+(l.qty>1?' x'+l.qty:'')}));}
+    }else if(l.kind==='repair'){
+      var r=find(db.repairs,l.refId);
+      if(r){r.status='ready';r.saleId=null;r.deliveredAt=null;S.push(T('The repair for {c} goes back to Ready',{c:r.customer||r.device}));}
+    }
+  });
+  if(ctx.top===s.id){
+    var back=(s.cash||0)+sum(s.payments,function(p){return p.amount;});
+    if(back>0)S.push(T('Give {n} Birr back to the customer',{n:fmt(back)}));
+    else if(back<0)S.push(T('The customer gives back {n} Birr that you paid out',{n:fmt(-back)}));
+  }
+  s.voided=true;s.voidedAt=Date.now();s.voidReason=ctx.reason||'';
+  log('undo','Sale reversed: {t} ({r})',{t:saleTitle(s),r:ctx.reason?T(ctx.reason):'-'});
+}
+function undoTakeApart(d,ctx){
+  var ps=db.parts.filter(function(p){return p.fromId===d.id;});
+  ps.forEach(function(p){
+    db.sales.slice().forEach(function(x){if(!x.voided&&x.lines.some(function(l){return l.kind==='part'&&l.refId===p.id;}))reverseSale(x,ctx);});
+    db.repairs.forEach(function(r){
+      var keep=[],removed=false;
+      r.parts.forEach(function(rp){if(rp.partId===p.id){removed=true;ctx.steps.push(T('Take {n} out of the repair for {c}',{n:T(p.name),c:r.customer||r.device}));}else keep.push(rp);});
+      if(removed){r.parts=keep;syncRepairSale(r);}
+    });
+  });
+  db.parts=db.parts.filter(function(p){return p.fromId!==d.id;});
+  ctx.steps.push(T('Remove the {n} parts taken from {d}',{n:ps.length,d:d.name}));
+  d.status='stock';delete d.partedAt;
+  ctx.steps.push(T('{d} goes back to used stock',{d:d.name}));
+  log('undo','Take-apart undone: {d}',{d:d.name});
+}
+function previewRun(fn){
+  var keep=db,ctx={steps:[],seen:{},ts:Date.now(),reason:'',top:null};
+  db=clone(keep);
+  try{fn(ctx);}finally{db=keep;}
+  return ctx;
+}
+function realRun(fn,reason){
+  var backup=clone(db),ctx={steps:[],seen:{},ts:Date.now(),reason:reason||'',top:null};
+  try{fn(ctx);save();}catch(e){db=backup;throw e;}
+  return ctx;
+}
+var undoSaleFn=function(id){return function(ctx){ctx.top=id;reverseSale(find(db.sales,id),ctx);};};
+var undoApartFn=function(id){return function(ctx){var d=find(db.used,id);if(d&&d.status==='parts')undoTakeApart(d,ctx);};};
+var previewUndoSale=function(id){return previewRun(undoSaleFn(id));};
+var previewUndoApart=function(id){return previewRun(undoApartFn(id));};
+
+/* ---------- taking a device apart ---------- */
+function apartCosts(){
+  var a=state.apart,dev=find(db.used,a.deviceId),rows=a.rows.filter(function(r){return r.name.trim();});
+  var tot=sum(rows,function(r){return num(r.share)||1;}),left=dev?dev.buy:0,out={};
+  rows.forEach(function(r,idx){var c=idx===rows.length-1?left:Math.round((dev?dev.buy:0)*(num(r.share)||1)/tot);left-=c;out[r.key]=c;});
+  return out;
+}
+function apartDefaults(cat){return (APART_DEFAULTS[cat]||APART_DEFAULTS.other).map(function(x){return {key:uid(),name:x[0],state:'untested',share:String(x[1])};});}
+function takeApart(){
+  var a=state.apart,dev=find(db.used,a.deviceId);
+  if(!dev||dev.status!=='stock')return T('Choose a device.');
+  var rows=a.rows.filter(function(r){return r.name.trim();});
+  if(!rows.length)return T('List at least one part.');
+  var costs=apartCosts(),now=Date.now();
+  rows.forEach(function(r){db.parts.push({id:uid(),name:r.name.trim(),cat:dev.cat,state:r.state,cost:costs[r.key],price:0,decision:'undecided',qty:1,from:dev.name,fromId:dev.id,ts:now});});
+  dev.status='parts';dev.partedAt=now;
+  log('part','Took apart {d}: {n} parts added',{d:dev.name,n:rows.length},now);
+  save();return '';
+}
+
+/* ---------- repairs ---------- */
+function repairPartsCost(r){return sum(r.parts,function(p){return p.qty*p.cost;});}
+function useInRepair(partId,repairId,qty){
+  var p=find(db.parts,partId),r=find(db.repairs,repairId);
+  if(!p||!r)return T('Choose a repair job.');
+  qty=Math.floor(qty);if(qty<1)return T('Enter how many you used.');if(qty>p.qty)return T('Only {n} left in stock for {i}.',{n:p.qty,i:T(p.name)});
+  p.qty-=qty;
+  var ex=null;r.parts.forEach(function(x){if(x.partId===p.id)ex=x;});
+  if(ex)ex.qty+=qty;else r.parts.push({partId:p.id,name:p.name,cat:p.cat,qty:qty,cost:p.cost});
+  syncRepairSale(r);
+  log('part','{n} used in the repair for {c}',{n:T(p.name)+(qty>1?' x'+qty:''),c:r.customer||r.device});
+  save();return '';
+}
+function removePartFromRepair(r,idx){
+  var rp=r.parts[idx];if(!rp)return;
+  var p=find(db.parts,rp.partId);
+  if(p)p.qty+=rp.qty;else db.parts.push({id:rp.partId,name:rp.name,cat:rp.cat||'phone',state:'untested',cost:rp.cost,price:0,decision:'undecided',qty:rp.qty,from:'',fromId:'',ts:Date.now()});
+  r.parts.splice(idx,1);syncRepairSale(r);
+  log('part','{n} taken out of the repair for {c}',{n:T(rp.name),c:r.customer||r.device});save();
+}
+function deliverRepair(r,fee,method,paid,other){
+  var now=Date.now(),cost=repairPartsCost(r)+other,sid=uid();
+  paid=Math.max(0,Math.min(paid,fee));
+  var sale={id:sid,ts:now,kind:'repair',lines:[{kind:'repair',refId:r.id,name:r.device,qty:1,price:fee,cost:cost}],subtotal:fee,discount:0,price:fee,cash:paid,balance:fee-paid,payments:[],profit:fee-cost,method:method,customer:r.customer||'',phone:r.phone||'',voided:false};
+  db.sales.push(sale);
+  r.status='delivered';r.deliveredAt=now;r.fee=fee;r.method=method;r.otherCost=other;r.saleId=sid;
+  log('repair','Repair delivered: {d} for {c}, {p} Birr',{d:r.device,c:r.customer||'-',p:fmt(fee)},now);
+  save();return sale;
+}
+
+/* ---------- stock corrections ---------- */
+function correctQty(it,newQty,reason,label){
+  var old=it.qty;it.qty=newQty;
+  log('fix','Stock corrected: {n} from {a} to {b} ({r})',{n:label||it.name,a:old,b:newQty,r:T(reason)});save();
+}
+function removeUnit(it,serial,reason){
+  var ix=it.serials.indexOf(serial);if(ix<0)return;it.serials.splice(ix,1);
+  log('fix','Unit removed from stock: {n} {s} ({r})',{n:it.name,s:serial,r:T(reason)});save();
+}
+
+/* ---------- notifications (calculated from the data, so they disappear when the problem is fixed) ---------- */
+function computeAlerts(){
+  var out=[],now=Date.now();
+  db.items.forEach(function(i){
+    if(!isLow(i))return;var s=stock(i);
+    out.push({key:'low:'+i.id,sev:s===0?'bad':'warn',t:i.name,s:s===0?T('Out of stock'):T('{n} left, reorder at {r}',{n:s,r:i.reorder}),go:{a:'item',id:i.id}});
+  });
+  var su=slowUsed().length,sn=slowNew().length,sp=slowParts().length;
+  if(su+sn+sp>0)out.push({key:'slow',sev:'warn',t:T('{n} items unsold for {d}+ days',{n:su+sn+sp,d:slowDays()}),s:T('{a} used, {b} new, {c} parts',{a:su,b:sn,c:sp}),go:{a:'page',v:'slow'}});
+  var un=undecidedNew().length+undecidedUsed().length+undecidedParts().length;
+  if(un>0)out.push({key:'undecided',sev:'info',t:T('{n} items have no price decision yet',{n:un}),s:T('Set a price, keep them undecided, or mark them as parts.'),go:{a:'undecided'}});
+  var debts=debtList();
+  if(debts.length){var owed=sum(debts,function(s){return s.balance;});out.push({key:'debts',sev:'warn',t:T('Customers owe you {n} Birr',{n:fmt(owed)}),s:T('{n} unpaid sales',{n:debts.length}),go:{a:'page',v:'debts'}});}
+  db.repairs.forEach(function(r){
+    if(r.status==='ready'&&r.readyAt&&daysSince(r.readyAt)>=3)out.push({key:'rdy:'+r.id,sev:'warn',t:T('{d} is ready for pickup',{d:r.device}),s:T('{c} has not collected it for {n} days',{c:r.customer||T('The customer'),n:daysSince(r.readyAt)}),go:{a:'repair',id:r.id}});
+    else if(r.status==='waiting'&&daysSince(r.ts)>=5)out.push({key:'wait:'+r.id,sev:'info',t:T('{d} is still waiting for parts',{d:r.device}),s:T('Open for {n} days',{n:daysSince(r.ts)}),go:{a:'repair',id:r.id}});
+  });
+  db.sales.forEach(function(s){
+    if(now-s.ts>3*DAY)return;
+    if(s.voided){if(s.voidedAt&&now-s.voidedAt<=3*DAY)out.push({key:'void:'+s.id,sev:'info',t:T('A sale was reversed'),s:saleTitle(s),go:{a:'sale',id:s.id}});return;}
+    if(saleBelowCost(s))out.push({key:'cost:'+s.id,sev:'warn',t:T('Sold below cost'),s:saleTitle(s)+' - '+fmt(s.price)+' Birr',go:{a:'sale',id:s.id}});
+    else if(s.discount>0&&s.discount>=0.1*s.subtotal)out.push({key:'disc:'+s.id,sev:'info',t:T('Large discount given'),s:saleTitle(s)+' - '+fmt(s.discount)+' Birr ('+T(s.discountReason)+')',go:{a:'sale',id:s.id}});
+  });
+  var hasData=db.items.length+db.used.length+db.sales.length>0;
+  if(!db.demo&&hasData&&(!db.settings.backupAt||daysSince(db.settings.backupAt)>=7))out.push({key:'backup',sev:'info',t:T('Back up your data'),s:db.settings.backupAt?T('Last backup was {n} days ago.',{n:daysSince(db.settings.backupAt)}):T('You have not made a backup yet.'),go:{a:'page',v:'settings'}});
+  var order={bad:0,warn:1,info:2};
+  return out.sort(function(a,b){return order[a.sev]-order[b.sev];});
+}
+function visibleAlerts(){var now=Date.now();return computeAlerts().filter(function(a){var d=db.alertsDismissed[a.key];return !d||now-d>DAY;});}
+function unseenAlerts(){return visibleAlerts().filter(function(a){return !db.alertsSeen[a.key];});}
+function markAlertsSeen(){var keys={};visibleAlerts().forEach(function(a){keys[a.key]=1;});db.alertsSeen=keys;save();}
+
+/* ---------- receipt, CSV, files ---------- */
+function receiptText(s){
+  var L=[],shop=db.shop||T('Your shop');
+  L.push(shop);L.push(fmtDate(s.ts)+' '+tfmt(s.ts));L.push('------------------------');
+  s.lines.forEach(function(l){
+    L.push(lineLabel(l).replace(/ x\d+$/,'')+(l.qty>1?' x'+l.qty:''));
+    if(l.serial)L.push('  IMEI/SN: '+l.serial);
+    if(l.kind!=='repair')L.push('  '+fmt(l.price)+' x '+l.qty+' = '+fmt(l.price*l.qty));else L.push('  '+fmt(l.price));
+  });
+  if(s.trade)L.push(T('Trade-in: {n}',{n:s.trade.name})+' -'+fmt(s.trade.value));
+  L.push('------------------------');
+  if(s.discount>0)L.push(T('Discount')+': -'+fmt(s.discount));
+  L.push(T('Total')+': '+fmt(s.price)+' Birr');
+  var paid=(s.cash||0)+sum(s.payments,function(p){return p.amount;});
+  L.push(T('Paid')+': '+fmt(paid)+' Birr ('+T(s.method)+')');
+  if(s.balance>0)L.push(T('Balance owed')+': '+fmt(s.balance)+' Birr');
+  if(s.customer)L.push(T('Customer')+': '+s.customer);
+  L.push(T('Thank you!'));
+  return L.join('\n');
+}
+function csvCell(v){v=v==null?'':String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+function toCsv(rows){return '﻿'+rows.map(function(r){return r.map(csvCell).join(',');}).join('\r\n');}
+function salesCsv(list){
+  var rows=[['Date','Time','Sale','Customer','Phone','IMEI or serial','Total','Discount','Cash received','Still owed','Profit','Paid by','Reversed']];
+  list.forEach(function(s){rows.push([ymd(s.ts),tfmt(s.ts),saleTitle(s),s.customer,s.phone,s.lines.map(function(l){return l.serial;}).filter(Boolean).join(' '),s.price,s.discount,s.cash,s.balance,s.profit,s.method,s.voided?'yes':'']);});
+  return toCsv(rows);
+}
+function stockCsv(){
+  var rows=[['Type','Name','Category','IMEI or serial','Quantity','Cost','Price','Condition','Decision']];
+  db.items.forEach(function(i){if(i.track==='serial')i.serials.forEach(function(s){rows.push(['New',i.name,i.cat,s,1,i.cost,i.price,'',i.decision]);});else rows.push(['New',i.name,i.cat,'',i.qty,i.cost,i.price,'',i.decision]);});
+  db.used.forEach(function(u){if(u.status==='stock')rows.push(['Used',u.name,DEV_CAT_LABEL[u.cat]||'',u.imei,1,u.buy,u.ask,u.grade,u.decision]);});
+  db.parts.forEach(function(p){if(p.qty>0)rows.push(['Part',p.name,DEV_CAT_LABEL[p.cat]||'',p.from,p.qty,p.cost,p.price,p.state,p.decision]);});
+  return toCsv(rows);
+}
+function expensesCsv(){
+  var rows=[['Date','Category','Note','Amount','Paid by']];
+  db.expenses.slice().sort(function(a,b){return a.ts-b.ts;}).forEach(function(e){rows.push([ymd(e.ts),e.cat,e.note,e.amount,e.method]);});
+  return toCsv(rows);
+}
+function repairsCsv(){
+  var rows=[['Received','Customer','Phone','Device','Problem','Status','Fee','Parts cost','Other cost','Delivered']];
+  db.repairs.slice().sort(function(a,b){return a.ts-b.ts;}).forEach(function(r){rows.push([ymd(r.ts),r.customer,r.phone,r.device,r.problem,r.status,r.fee||'',repairPartsCost(r),r.otherCost||0,r.deliveredAt?ymd(r.deliveredAt):'']);});
+  return toCsv(rows);
+}
+function downloadFile(name,text,mime){
+  try{
+    var blob=new Blob([text],{type:mime||'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download=name;document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},4000);return true;
+  }catch(e){return false;}
+}
+
+/* Shop Stock screens: the tabs (Home, Stock, Sales, Repair) and the full pages (New sale, Trade-in, Notifications, Menu, Settings, Activity, Expenses, Customers who owe, Unsold stock). */
+
+/* ---------- shared row builders ---------- */
+function saleRow(s){
+  return '<button class="row'+(s.voided?' off':'')+'" data-a="sale" data-id="'+s.id+'"><span class="grow"><b>'+esc(saleTitle(s))+'</b><small>'+esc(whenLabel(s.ts))+' · '+esc(T(s.method))+(s.customer?' · '+esc(s.customer):'')+'</small>'+tagsHtml(saleTags(s))+'</span><span class="end"><b class="num">'+fmt(s.price)+'</b><small class="num">'+esc(T('profit'))+' '+fmt(s.profit)+'</small></span></button>';
+}
+function alertRow(a){
+  return '<button class="row" data-a="alertGo" data-k="'+esc(a.key)+'"><span class="alert-dot dot '+a.sev+'" style="width:10px;height:10px;border-radius:50%;flex:none;background:'+(a.sev==='bad'?'var(--bad)':a.sev==='warn'?'#D98A00':'var(--accent)')+'"></span><span class="grow"><b>'+esc(a.t)+'</b><small>'+esc(a.s)+'</small></span>'+ic(I.chev,18)+'</button>';
+}
+function newRow(i){
+  var s=stock(i),low=isLow(i);
+  var right=i.decision==='parts'?tag(T('For parts'),'gray'):tag(s===0?T('Out'):low?T('Low'):T('OK'),low?'bad':'good');
+  return '<button class="row" data-a="item" data-id="'+i.id+'"><span class="grow"><b>'+esc(i.name)+'</b><small>'+esc(T(i.cat))+', '+esc(i.track==='serial'?T('tracked by IMEI or serial'):T('counted by quantity'))+'</small><span class="num" style="font-weight:600;margin-top:4px">'+(i.decision==='undecided'||!i.price?esc(T('Price undecided')):fmt(i.price)+' '+esc(T('Birr')))+'</span></span><span class="end"><span class="stockn num" style="color:'+(low?'var(--bad)':'var(--ink)')+'">'+s+'</span>'+right+'</span></button>';
+}
+function usedRow(u){
+  var right;
+  if(u.status==='sold')right='<b class="num">'+fmt(u.soldPrice)+'</b><small>'+esc(T('Sold'))+'</small>';
+  else if(u.status==='parts')right='<b>'+esc(T('Parts'))+'</b><small>'+esc(T('Taken apart'))+'</small>';
+  else right=priceText(u.ask,u.decision)+'<small class="num">'+esc(T('Bought'))+' '+fmt(u.buy)+'</small>';
+  var undec=u.status==='stock'&&u.decision==='undecided';
+  return '<button class="row" data-a="used" data-id="'+u.id+'"><span class="grade g'+u.grade+'">'+u.grade+'</span><span class="grow"><b>'+esc(u.name)+'</b><small>'+esc(u.imei?u.imei:T('No IMEI or serial'))+', '+esc(ageLabel(u.ts))+'</small>'+(undec?tagsHtml([{t:T('Undecided'),k:'warn'}]):'')+'</span><span class="end">'+right+'</span></button>';
+}
+function partRow(p){
+  var k=p.state==='tested'?'good':p.state==='faulty'?'bad':'warn';
+  return '<button class="row" data-a="part" data-id="'+p.id+'"><span class="grow"><b>'+esc(T(p.name))+(p.qty>1?' x'+p.qty:'')+'</b><small>'+esc(T('From'))+' '+esc(p.from?T(p.from):T('unknown'))+'</small>'+(p.qty>0&&p.decision==='undecided'?tagsHtml([{t:T('Undecided'),k:'warn'}]):'')+'</span><span class="end"><b class="num">'+(p.qty>0?(p.price?fmt(p.price):'-'):T('Gone'))+'</b><small class="num">'+esc(T('cost'))+' '+fmt(p.cost)+'</small>'+tag(T(cap(p.state)),k)+'</span></button>';
+}
+function repairRow(r){
+  var k=r.status==='ready'?'good':r.status==='delivered'?'gray':r.status==='waiting'?'warn':'info';
+  return '<button class="row" data-a="repair" data-id="'+r.id+'"><span class="grow"><b>'+esc(r.device)+'</b><small>'+esc(r.customer||T('No name'))+' · '+esc(r.problem||'')+'</small><small>'+esc(ageLabel(r.ts))+'</small></span><span class="end"><b class="num">'+fmt(r.status==='delivered'?r.fee:r.estimate)+'</b>'+tag(T(cap(r.status)),k)+'</span></button>';
+}
+function dayGroups(list,rowFn,tsOf){
+  var out='',cur='',bucket=[];
+  var flush=function(){if(bucket.length)out+='<div class="dayhead"><span>'+esc(dayLabel(bucket[0].ts))+'</span><span class="num">'+esc(T('{n} sales',{n:bucket.length}))+' · '+fmt(sum(bucket.filter(function(s){return !s.voided;}),function(s){return s.price;}))+'</span></div>'+bucket.map(rowFn).join('');bucket=[];};
+  list.forEach(function(s){var d=startOfDay(tsOf(s));if(d!==cur){flush();cur=d;}bucket.push(s);});
+  flush();return out;
+}
+
+/* ---------- HOME ---------- */
+function viewHome(){
+  var t0=startOfDay(Date.now()),t1=addDays(t0,1),todays=salesBetween(t0,t1,false),tot=totalsFor(todays,t0,t1);
+  var spent=sum(expensesBetween(t0,t1),function(e){return e.amount;});
+  var low=db.items.filter(isLow).length,slow=slowUsed().length+slowNew().length+slowParts().length;
+  var openR=db.repairs.filter(function(r){return r.status!=='delivered';}).length;
+  var debtors=uniq(debtList().map(function(s){return (s.customer||'?')+'|'+(s.phone||'');})).length;
+  var alerts=visibleAlerts(),unseen=unseenAlerts().length;
+  var recent=db.sales.filter(function(s){return !s.voided;}).sort(function(a,b){return b.ts-a.ts;}).slice(0,5);
+  var today=dfmt(Date.now(),{weekday:'long',month:'short',day:'numeric'});
+  var wk=[],wmx=1,wi;for(wi=6;wi>=0;wi--){var d0=addDays(t0,-wi),d1=addDays(d0,1),val=totalsFor(salesBetween(d0,d1,false),d0,d1).value;wk.push({v:val,l:dfmt(d0,{weekday:'narrow'}),t:wi===0});if(val>wmx)wmx=val;}
+  var weekHtml='<div class="wk">'+wk.map(function(x){return '<div class="wc'+(x.t?' on':'')+'"><div class="wb"><i style="height:'+Math.max(4,Math.round(x.v/wmx*100))+'%"></i></div><span>'+esc(x.l)+'</span></div>';}).join('')+'</div>';
+  var hasData=db.items.length+db.used.length+db.sales.length>0;
+  var backupDue=!db.demo&&hasData&&(!db.settings.backupAt||daysSince(db.settings.backupAt)>=14);
+  return '<header class="top"><div><p class="sub" style="margin:0 0 2px">'+esc(today)+'</p><h1>'+esc(db.shop||T('Your shop'))+'</h1></div><div class="acts">'+
+    iconBtn('page',I.bell,T('Notifications'),unseen?'<span class="badge">'+unseen+'</span>':'','notifications')+iconBtn('page',I.menu,T('Menu'),'','menu')+'</div></header>'+
+  (!storageOK?'<div class="banner"><span>'+esc(T('This browser is not saving data. Your changes will be lost when you close the page.'))+'</span></div>':'')+
+  (backupDue?'<div class="banner"><span>'+esc(T('You have not backed up your data for a while.'))+'</span><button data-a="page" data-v="settings">'+esc(T('Back up'))+'</button></div>':'')+
+  '<button class="hero" data-a="goSales" data-v="today"><div class="toprow"><div><div class="label">'+esc(T("Today's sales"))+'</div><div class="big num">'+fmt(tot.value)+'<span>'+esc(T('Birr'))+'</span></div></div>'+ic(I.chev,22)+'</div>'+
+  '<div class="stats"><div><div class="label">'+esc(T('Profit'))+'</div><b class="num">'+fmt(tot.profit)+'</b></div><div><div class="label">'+esc(T('Cash in'))+'</div><b class="num">'+fmt(tot.cash)+'</b></div><div><div class="label">'+esc(T('Spent'))+'</div><b class="num">'+fmt(spent)+'</b></div></div>'+weekHtml+'</button>'+
+  '<section class="tiles"><button class="tile" data-a="goLow"><b class="num" style="color:'+(low?'var(--bad)':'var(--ink)')+'">'+low+'</b><span>'+esc(T('Low stock'))+'</span></button>'+
+  '<button class="tile" data-a="page" data-v="slow"><b class="num" style="color:'+(slow?'var(--warn)':'var(--ink)')+'">'+slow+'</b><span>'+esc(T('Slow stock'))+'</span></button>'+
+  '<button class="tile" data-a="goRepair"><b class="num">'+openR+'</b><span>'+esc(T('Open repairs'))+'</span></button>'+
+  '<button class="tile" data-a="goUsed"><b class="num">'+usedInStock().length+'</b><span>'+esc(T('Used units'))+'</span></button>'+
+  '<button class="tile" data-a="goParts"><b class="num">'+partUnits(partsInStock())+'</b><span>'+esc(T('Spare parts'))+'</span></button>'+
+  '<button class="tile" data-a="page" data-v="debts"><b class="num" style="color:'+(debtors?'var(--warn)':'var(--ink)')+'">'+debtors+'</b><span>'+esc(T('Customers owe'))+'</span></button></section>'+
+  '<div class="btns"><button class="btn primary" data-a="openSale">'+ic(I.plus,18,2.2)+esc(T('New sale'))+'</button><button class="btn" data-a="page" data-v="trade">'+ic(I.swap,18)+esc(T('Trade-in'))+'</button></div>'+
+  '<div class="btns"><button class="btn" data-a="repairNew">'+ic(I.wrench,18)+esc(T('New repair'))+'</button><button class="btn" data-a="expenseNew">'+ic(I.wallet,18)+esc(T('Add expense'))+'</button></div>'+
+  '<section class="card"><div class="cardhead"><h3>'+esc(T('Needs attention'))+'</h3>'+(alerts.length>4?'<button class="link" data-a="page" data-v="notifications">'+esc(T('See all'))+'</button>':'')+'</div>'+(alerts.length?alerts.slice(0,4).map(alertRow).join(''):'<p class="empty" style="padding-block:10px">'+esc(T('Nothing needs attention right now.'))+'</p>')+'</section>'+
+  '<section class="card"><div class="cardhead"><h3>'+esc(T('Recent sales'))+'</h3><button class="link" data-a="goSales" data-v="week">'+esc(T('See all'))+'</button></div>'+(recent.length?recent.map(saleRow).join(''):'<p class="empty" style="padding-block:10px">'+esc(T('No sales yet. Record your first sale with the + button.'))+'</p>')+'</section>';
+}
+
+/* ---------- STOCK (New | Used | Parts) ---------- */
+function viewStock(){
+  var st=state.stockTab,sub,add=st==='new'?'itemNew':st==='used'?'usedNew':'partNew',lbl=st==='new'?T('Add item'):st==='used'?T('Add used device'):T('Add part');
+  if(st==='new')sub=viewNew();else if(st==='used')sub=viewUsed();else sub=viewParts();
+  return topbar(T('Stock'),null,addBtn(add,lbl))+
+    segHtml([{v:'new',t:T('New')},{v:'used',t:T('Used')},{v:'parts',t:T('Parts')}],st,'stockTab')+sub;
+}
+function newList(){
+  var q=state.q.trim().toLowerCase(),c=state.newCat;
+  var list=db.items.filter(function(i){
+    if(c==='Low'&&!isLow(i))return false;
+    if(c==='Undecided'&&i.decision!=='undecided')return false;
+    if(c!=='All'&&c!=='Low'&&c!=='Undecided'&&i.cat!==c)return false;
+    if(q&&(i.name+' '+i.cat+' '+T(i.cat)+' '+i.serials.join(' ')).toLowerCase().indexOf(q)<0)return false;
+    return true;
+  });
+  if(!list.length)return emptyMsg(db.items.length?T('No items match. Try a different search or filter.'):T('No items yet. Tap + to add your first item.'));
+  return list.map(newRow).join('');
+}
+function viewNew(){
+  var cats=[];db.items.forEach(function(i){if(cats.indexOf(i.cat)<0)cats.push(i.cat);});
+  var lowN=db.items.filter(isLow).length,und=undecidedNew().length;
+  var opts=[{v:'All',t:T('All')},{v:'Low',t:T('Low stock')+' ('+lowN+')'}];
+  if(und)opts.push({v:'Undecided',t:T('Undecided')+' ('+und+')'});
+  opts=opts.concat(cats.map(function(c){return {v:c,t:T(c)};}));
+  return '<p class="sub" style="margin-top:-6px">'+esc(T('{n} products, {l} low on stock',{n:db.items.length,l:lowN}))+'</p>'+
+    searchBox('q',T('Search name or IMEI'),state.q,'newList')+chipsRow(opts,state.newCat,'setNewCat')+
+    (state.newCat==='Low'&&lowN?'<button class="btn wide" data-a="shareReorder">'+ic(I.share,18)+esc(T('Share reorder list'))+'</button>':'')+
+    '<section class="card flush" id="newList">'+newList()+'</section>';
+}
+function usedList(){
+  var q=state.usedQ.trim().toLowerCase();
+  var list=db.used.filter(function(u){
+    if(u.status!==state.usedStatus)return false;
+    if(state.usedGrade==='Undecided'){if(u.decision!=='undecided')return false;}
+    else if(state.usedGrade!=='All'&&u.grade!==state.usedGrade)return false;
+    if(q&&(u.name+' '+(u.imei||'')+' '+(u.notes||'')).toLowerCase().indexOf(q)<0)return false;
+    return true;
+  }).sort(function(a,b){return b.ts-a.ts;});
+  return list.length?list.map(usedRow).join(''):emptyMsg(T('Nothing here yet.'));
+}
+function viewUsed(){
+  var inStock=usedInStock(),tied=sum(inStock,function(u){return u.buy;}),slowN=slowUsed().length,und=undecidedUsed().length;
+  var gradeOpts=[{v:'All',t:T('All')}];
+  if(und)gradeOpts.push({v:'Undecided',t:T('Undecided')+' ('+und+')'});
+  Object.keys(GRADES).forEach(function(g){gradeOpts.push({v:g,t:g});});
+  return '<p class="sub" style="margin-top:-6px">'+esc(T('{n} units in stock, graded A to E',{n:inStock.length}))+'</p>'+
+  '<section class="tiles2"><div class="tile"><span>'+esc(T('Money tied up'))+'</span><b class="num" style="font-size:20px;margin-top:4px">'+fmt(tied)+'</b></div>'+
+  '<button class="tile" data-a="page" data-v="slow"><span>'+esc(T('Unsold {n}+ days',{n:slowDays()}))+'</span><b class="num" style="font-size:20px;margin-top:4px;color:'+(slowN?'var(--warn)':'var(--ink)')+'">'+esc(T('{n} units',{n:slowN}))+'</b></button></section>'+
+  segHtml([{v:'stock',t:T('In stock')},{v:'sold',t:T('Sold')},{v:'parts',t:T('Taken apart')}],state.usedStatus,'setUsedStatus')+
+  searchBox('uq',T('Search name or IMEI'),state.usedQ,'usedList')+
+  chipsRow(gradeOpts,state.usedGrade,'setUsedGrade')+
+  '<section class="card flush" id="usedList">'+usedList()+'</section>';
+}
+function partsInCat(c){return db.parts.filter(function(p){return p.cat===c;});}
+function partList(){
+  var q=state.partQ.trim().toLowerCase(),c=state.partCat;
+  var list=partsInCat(c).filter(function(p){
+    if(state.partStatus==='stock'?p.qty<=0:p.qty>0)return false;
+    if(state.partType!=='All'&&p.name!==state.partType)return false;
+    if(q&&(p.name+' '+T(p.name)+' '+(p.from||'')).toLowerCase().indexOf(q)<0)return false;
+    return true;
+  }).sort(function(a,b){return b.ts-a.ts;});
+  return list.length?list.map(partRow).join(''):emptyMsg(T('No parts here yet.'));
+}
+function viewParts(){
+  var apart='<section class="hero" style="gap:10px"><div><div style="font-size:16px;font-weight:700">'+esc(T('Take a device apart'))+'</div><div class="label" style="margin-top:4px;line-height:1.4">'+esc(T('Pick a used device, list the parts you got, and the app splits its buy-in cost across them.'))+'</div></div><button class="btn wide" data-a="apartOpen">'+esc(T('Start'))+'</button></section>';
+  if(state.partCat==null){
+    var cards=DEV_CATS.map(function(c){
+      var ps=partsInCat(c),n=partUnits(ps.filter(function(p){return p.qty>0;})),val=sum(ps,function(p){return p.qty*p.cost;});
+      return '<button class="catcard" data-a="partCat" data-v="'+c+'"><span class="ci">'+ic(partCatIcon(c),22)+'</span><b>'+esc(T(DEV_CAT_LABEL[c]))+'</b><small>'+esc(T('{n} parts in stock',{n:n}))+'</small></button>';
+    }).join('');
+    return '<p class="sub" style="margin-top:-6px">'+esc(T('Choose what the part came from'))+'</p><div class="catgrid">'+cards+'</div>'+apart;
+  }
+  var c=state.partCat,types=[];
+  PART_TYPES[c].forEach(function(t){types.push(t);});partsInCat(c).forEach(function(p){if(types.indexOf(p.name)<0)types.push(p.name);});
+  var present=types.filter(function(t){return partsInCat(c).some(function(p){return p.name===t;});});
+  return '<div class="btns" style="align-items:center"><button class="btn sm" data-a="partCat" data-v="" style="flex:none">'+ic(I.back,18,2)+esc(T('Categories'))+'</button><b style="flex:1;font-size:18px">'+esc(T(DEV_CAT_LABEL[c]))+'</b></div>'+
+    segHtml([{v:'stock',t:T('In stock')},{v:'gone',t:T('Used or sold')}],state.partStatus,'setPartStatus')+
+    searchBox('pq',T('Search parts'),state.partQ,'partList')+
+    chipsRow([{v:'All',t:T('All')}].concat(present.map(function(t){return {v:t,t:T(t)};})),state.partType,'setPartType')+
+    '<section class="card flush" id="partList">'+partList()+'</section>'+apart;
+}
+
+/* ---------- SALES (history by period) ---------- */
+function salesBody(){
+  var r=periodRange(state.salesPeriod),q=state.salesQ.trim(),list=salesBetween(r[0],r[1],state.salesVoid);
+  if(q)list=list.filter(function(s){return saleMatches(s,q);});
+  var act=list.filter(function(s){return !s.voided;}),tot=totalsFor(act,r[0],r[1]);
+  if(q)tot.cash=sum(act,function(s){return (s.ts>=r[0]&&s.ts<r[1]?s.cash:0)+sum(s.payments,function(p){return p.ts>=r[0]&&p.ts<r[1]?p.amount:0;});});
+  var multi=(r[1]-r[0])>DAY;
+  var body=list.length?(multi?dayGroups(list,saleRow,function(s){return s.ts;}):list.map(saleRow).join('')):emptyMsg(q?T('No sales match your search.'):T('No sales in this period.'));
+  return '<section class="card"><div class="sum"><div class="l"><span>'+esc(q?T('Matching sales'):periodLabel(state.salesPeriod))+'</span><span class="num">'+esc(T('{n} sales',{n:tot.count}))+'</span></div>'+
+    '<div class="facts"><div><small>'+esc(T('Sales value'))+'</small><b class="num">'+fmt(tot.value)+'</b></div><div><small>'+esc(T('Cash received'))+'</small><b class="num">'+fmt(tot.cash)+'</b></div><div><small>'+esc(T('Profit'))+'</small><b class="num">'+fmt(tot.profit)+'</b></div><div><small>'+esc(T('Still owed'))+'</small><b class="num">'+fmt(tot.owed)+'</b></div></div></div></section>'+
+    '<section class="card flush">'+body+'</section>';
+}
+function viewSales(){
+  var p=state.salesPeriod;
+  var opts=[{v:'today',t:T('Today')},{v:'yesterday',t:T('Yesterday')},{v:'week',t:T('This week')},{v:'date',t:T('A date')},{v:'range',t:T('Date range')}];
+  var pick='';
+  if(p==='date')pick=fInput('sd',T('Date'),{b:'salesDate',type:'date',max:ymd(Date.now())});
+  if(p==='range')pick='<div class="grid2">'+fInput('sf',T('From'),{b:'salesFrom',type:'date',max:ymd(Date.now())})+fInput('st',T('To'),{b:'salesTo',type:'date',max:ymd(Date.now())})+'</div>';
+  return topbar(T('Sales'),null,addBtn('openSale',T('New sale'))+iconBtn('exportSales',I.download,T('Export this list to Excel')))+
+    chipsRow(opts,p,'salesPeriod')+pick+
+    searchBox('sq',T('Search sales, customers or IMEI'),state.salesQ,'salesBody')+
+    '<div class="chips"><button class="chip" data-a="toggleVoid" aria-pressed="'+state.salesVoid+'">'+esc(T('Show reversed sales'))+'</button></div>'+
+    '<div id="salesBody" class="form">'+salesBody()+'</div>';
+}
+
+/* ---------- REPAIR ---------- */
+function repairList(){
+  var q=state.repairQ.trim().toLowerCase(),f=state.repairFilter;
+  var list=db.repairs.filter(function(r){
+    if(f==='open'&&r.status==='delivered')return false;
+    if(f==='ready'&&r.status!=='ready')return false;
+    if(f==='delivered'&&r.status!=='delivered')return false;
+    if(q&&(r.device+' '+(r.customer||'')+' '+(r.phone||'')+' '+(r.problem||'')+' '+(r.imei||'')).toLowerCase().indexOf(q)<0)return false;
+    return true;
+  }).sort(function(a,b){return b.ts-a.ts;});
+  return list.length?list.map(repairRow).join(''):emptyMsg(T('No repair jobs here.'));
+}
+function viewRepair(){
+  var t0=startOfDay(Date.now()),m0=new Date(t0);m0.setDate(1);m0=m0.getTime();
+  var inc=function(a,b){return sum(db.sales.filter(function(s){return !s.voided&&s.ts>=a&&s.ts<b&&s.lines.length===1&&s.lines[0].kind==='repair';}),function(s){return s.price;});};
+  var openN=db.repairs.filter(function(r){return r.status!=='delivered';}).length,rdy=db.repairs.filter(function(r){return r.status==='ready';}).length;
+  var opts=[{v:'open',t:T('Open')+' ('+openN+')'},{v:'ready',t:T('Ready')+' ('+rdy+')'},{v:'delivered',t:T('Delivered')},{v:'all',t:T('All')}];
+  return topbar(T('Repair'),T('{n} open jobs',{n:openN}),addBtn('repairNew',T('New repair')))+
+    '<section class="tiles2"><div class="tile"><span>'+esc(T('Repair income today'))+'</span><b class="num" style="font-size:20px;margin-top:4px">'+fmt(inc(t0,addDays(t0,1)))+'</b></div><div class="tile"><span>'+esc(T('This month'))+'</span><b class="num" style="font-size:20px;margin-top:4px">'+fmt(inc(m0,addDays(t0,1)))+'</b></div></section>'+
+    chipsRow(opts,state.repairFilter,'setRepairFilter')+
+    searchBox('rq',T('Search device, customer or phone'),state.repairQ,'repairList')+
+    '<section class="card flush" id="repairList">'+repairList()+'</section>';
+}
+
+/* ---------- PAGE: new sale (cart) ---------- */
+function cartLineHtml(l,idx){
+  var r=lineRef(l),sub='';
+  if(l.kind==='new'&&r&&r.track==='serial')sub=l.serial?'<span class="mono">IMEI/SN '+esc(l.serial)+'</span>':'';
+  else if(l.kind==='used')sub=esc(T('Used'))+(r&&r.imei?', <span class="mono">'+esc(r.imei)+'</span>':'');
+  else if(l.kind==='part')sub=esc(T('Spare part'));
+  var needUnit=l.kind==='new'&&r&&r.track==='serial'&&!l.serial;
+  var qty=(l.kind==='new'&&r&&r.track==='qty')||l.kind==='part';
+  var max=r?(l.kind==='used'?1:(l.kind==='new'&&r.track==='serial'?1:r.qty)):1;
+  return '<div class="cartline"><div class="top2"><div><b>'+esc(l.kind==='part'?T(l.name):l.name)+'</b><div><small>'+sub+'</small></div></div><button class="iconbtn" data-a="cartRm" data-v="'+idx+'" aria-label="'+esc(T('Remove'))+'">'+ic(I.x,20,2)+'</button></div>'+
+    (needUnit?'<button class="btn sm danger" data-a="cartPick" data-v="'+idx+'">'+esc(T('Choose IMEI or serial number'))+'</button>':'')+
+    '<div class="grid2">'+fInput('lp'+idx,T('Price each (Birr)'),{b:'cart.lines.'+idx+'.price',im:'numeric',live:'cart'})+
+    (qty?'<div class="field">'+esc(T('Quantity'))+'<div class="stepper"><button type="button" data-a="cartQty" data-v="'+idx+':-1" aria-label="'+esc(T('Less'))+'">'+ic(I.minus,18,2)+'</button><b class="num" id="lq'+idx+'">'+l.qty+'</b><button type="button" data-a="cartQty" data-v="'+idx+':1" data-max="'+max+'" aria-label="'+esc(T('More'))+'">'+ic(I.plus,18,2)+'</button></div></div>':'<div></div>')+'</div>'+
+    '<div id="lw'+idx+'"></div></div>';
+}
+function cartSummaryHtml(){
+  var t=cartTotals(state.cart);
+  return '<div class="sum"><div class="l"><span>'+esc(T('Subtotal'))+'</span><span class="num">'+fmt(t.sub)+'</span></div>'+
+    (t.disc>0?'<div class="l"><span>'+esc(T('Discount'))+'</span><span class="num">- '+fmt(t.disc)+'</span></div>':'')+
+    '<div class="total"><span style="font-weight:700">'+esc(T('Total'))+'</span><b class="num">'+fmt(t.total)+' <small style="font-size:14px;font-weight:600">'+esc(T('Birr'))+'</small></b></div>'+
+    '<div class="l"><span>'+esc(T('Paid now'))+'</span><span class="num">'+fmt(t.paid)+'</span></div>'+
+    (t.balance>0?'<div class="l"><span>'+esc(T('Still owed'))+'</span><span class="num" style="color:var(--warn);font-weight:700">'+fmt(t.balance)+'</span></div>':'')+'</div>';
+}
+function customersList(){
+  var seen={},o='';db.sales.forEach(function(s){if(s.customer&&!seen[s.customer]){seen[s.customer]=1;o+='<option value="'+esc(s.customer)+'">';}});
+  return '<datalist id="custlist">'+o+'</datalist>';
+}
+function pageSale(){
+  var c=state.cart,rs=REASONS_DISC.map(function(r){return {v:r,t:T(r)};});
+  return pagehead(T('New sale'))+
+    '<section class="card"><div class="cardhead"><h3>'+esc(T('Items'))+'</h3></div>'+(c.lines.length?c.lines.map(cartLineHtml).join(''):'<p class="empty" style="padding-block:10px">'+esc(T('No items yet. Tap Add item.'))+'</p>')+
+    '<button class="btn wide" data-a="cartAdd" style="margin-top:10px">'+ic(I.plus,18,2.2)+esc(T('Add item'))+'</button></section>'+
+    '<section class="card form"><h3 style="margin:0">'+esc(T('Customer (optional)'))+'</h3>'+customersList()+
+    '<div class="grid2">'+fInput('cc',T('Name'),{b:'cart.customer',list:'custlist',live:'cart'})+fInput('cp',T('Phone'),{b:'cart.phone',type:'tel',im:'tel'})+'</div></section>'+
+    '<section class="card form"><h3 style="margin:0">'+esc(T('Payment'))+'</h3>'+
+    '<div class="grid2">'+fInput('cd',T('Discount (Birr)'),{b:'cart.discount',im:'numeric',live:'cart'})+fInput('cpd',T('Paid now'),{b:'cart.paid',im:'numeric',live:'cart',ph:T('Full amount')})+'</div>'+
+    fSelect('cr',T('Reason for the discount'),[{v:'',t:T('Choose a reason')}].concat(rs),{b:'cart.reason',live:'cart',hid:!(num(c.discount)>0)})+
+    '<div><div class="field" style="margin-bottom:6px">'+esc(T('Paid by'))+'</div>'+segHtml(methodOpts(),c.method,'cartMethod')+'</div></section>'+
+    '<section class="card"><div id="cartSummary">'+cartSummaryHtml()+'</div></section>'+
+    '<p class="err" id="cartErr" role="alert" hidden></p>'+
+    '<button class="btn primary wide" data-a="cartGo">'+esc(T('Record sale'))+'</button>';
+}
+
+/* ---------- PAGE: trade-in ---------- */
+function unitListHtml(it,selected,multi,taken,filterId){
+  var u=(it.serials||[]).filter(function(s){return !(taken&&taken[s]);});
+  if(!u.length)return '<p class="empty">'+esc(T('No units left.'))+'</p>';
+  return (u.length>6?'<label class="search">'+ic(I.search,20)+'<input id="'+filterId+'" type="search" placeholder="'+esc(T('Search IMEI or serial'))+'" aria-label="'+esc(T('Search IMEI or serial'))+'" data-live="unitFilter" autocomplete="off"></label>':'')+
+    '<div class="unitlist" role="group" aria-label="'+esc(T('IMEI or serial numbers'))+'">'+u.map(function(s){
+      return '<label class="unit" data-s="'+esc(s.toLowerCase())+'"><input type="'+(multi?'checkbox':'radio')+'" name="unit" value="'+esc(s)+'" data-unit'+(selected&&selected.indexOf(s)>=0?' checked':'')+'><span class="mono">'+esc(s)+'</span></label>';
+    }).join('')+'</div>';
+}
+function tradeSummary(){
+  var c=tradeCalc(),t=state.trade,out=c.diff<0;
+  return '<div class="sum"><div class="l"><span>'+esc(T('New device'))+'</span><span class="num">'+fmt(c.price)+'</span></div><div class="l"><span>'+esc(T('Trade-in value'))+'</span><span class="num">- '+fmt(c.value)+'</span></div>'+
+  '<div class="total"><span style="font-weight:700">'+esc(out?T('You pay the customer'):T('Customer pays'))+'</span><b class="num'+(out?' out':'')+'">'+fmt(Math.abs(c.diff))+' <small style="font-size:14px;font-weight:600">'+esc(T('Birr'))+'</small></b></div></div>'+
+  '<div style="margin-top:12px"><small style="font-weight:700;color:var(--ink)">'+esc(T('When you confirm, the app will:'))+'</small>'+okSteps([
+    T('Remove {n} from new stock',{n:c.it?c.it.name:T('the new device')}),
+    T('Add {n} to used stock at a cost of {c}',{n:t.name.trim()||T('the old device'),c:fmt(c.value)}),
+    out?T('Record {n} Birr paid out by {m}',{n:fmt(Math.abs(c.diff)),m:T(t.method)}):T('Record {n} Birr received by {m}',{n:fmt(Math.abs(c.diff)),m:T(t.method)})])+'</div>'+
+  (c.miss.length?'<p class="sub" style="margin-top:10px">'+esc(T('Still needed: {n}.',{n:c.miss.join(', ')}))+'</p>':'');
+}
+function pageTrade(){
+  var t=state.trade,c=tradeCalc();
+  var avail=db.items.filter(function(i){return stock(i)>0&&i.decision!=='parts';});
+  var itemOpts=[{v:'',t:T('Choose a new device')}].concat(avail.map(function(i){return {v:i.id,t:i.name+' ('+stock(i)+' '+T('left')+')'};}));
+  var units='';
+  if(c.it&&c.it.track==='serial')units='<div class="field">'+esc(T('Which unit does the customer take?'))+'</div>'+unitListHtml(c.it,t.serial?[t.serial]:[],false,null,'tfilter');
+  return pagehead(T('Trade-in'))+
+  (state.tradeDone?'<div class="okbox">'+ic(I.check,20,2.4)+'<span>'+esc(state.tradeDone)+'</span></div>':'')+
+  '<section class="card form"><h3 style="margin:0">'+esc(T('Customer brings'))+'</h3>'+
+  fSelect('tc',T('Type of device'),DEV_CATS.map(function(x){return {v:x,t:T(DEV_CAT_LABEL[x])};}),{b:'trade.cat'})+
+  fInput('tn',T('Device'),{b:'trade.name',live:'trade',ph:T('For example Samsung A54')})+
+  fInput('ti',T('IMEI or serial number'),{b:'trade.imei',im:'text'})+
+  '<div><div class="field" style="margin-bottom:6px">'+esc(T('Condition'))+'</div><div class="chips" role="group" aria-label="'+esc(T('Condition'))+'">'+Object.keys(GRADES).map(function(g){return '<button type="button" class="chip" data-a="tradeGrade" data-v="'+g+'" aria-pressed="'+(t.grade===g)+'">'+g+'</button>';}).join('')+'</div><small>'+esc(t.grade)+': '+esc(T(GRADES[t.grade]))+'</small></div>'+
+  '<div class="grid2">'+fInput('tv',T('Agreed value (Birr)'),{b:'trade.value',im:'numeric',live:'trade'})+fInput('ta',T('Resale price (optional)'),{b:'trade.ask',im:'numeric'})+'</div>'+
+  fInput('tcu',T('Customer name or phone (optional)'),{b:'trade.customer'})+'</section>'+
+  '<section class="card form"><h3 style="margin:0">'+esc(T('Customer takes'))+'</h3>'+
+  fSelect('tit',T('New device'),itemOpts,{b:'trade.itemId',live:'tradeItem'})+units+
+  fInput('tp',T('Selling price (Birr)'),{b:'trade.price',im:'numeric',live:'trade'})+'</section>'+
+  '<section class="card"><div id="tradeSummary">'+tradeSummary()+'</div></section>'+
+  '<div><div class="field" style="margin-bottom:6px">'+esc(T('Paid by'))+'</div>'+segHtml(methodOpts(),t.method,'tradeMethod')+'</div>'+
+  '<p class="err" id="tradeErr" role="alert" hidden></p>'+
+  '<button class="btn primary wide" id="tradeGo" data-a="tradeGo">'+esc(T('Confirm trade-in'))+'</button>';
+}
+
+/* ---------- PAGE: notifications ---------- */
+function pageNotifications(){
+  var al=visibleAlerts(),low=db.items.filter(isLow).length;
+  var rows=al.map(function(a){
+    return '<div class="alert"><span class="dot '+a.sev+'"></span><div class="grow"><b>'+esc(a.t)+'</b><small>'+esc(a.s)+'</small><div class="acts"><button data-a="alertGo" data-k="'+esc(a.key)+'">'+esc(T('Open'))+'</button><button class="muted" data-a="alertHide" data-k="'+esc(a.key)+'">'+esc(T('Hide for today'))+'</button></div></div></div>';
+  }).join('');
+  return pagehead(T('Notifications'))+
+    (low?'<button class="btn wide" data-a="shareReorder">'+ic(I.share,18)+esc(T('Share reorder list'))+'</button>':'')+
+    '<section class="card">'+(rows||'<p class="empty">'+esc(T('Nothing needs attention right now.'))+'</p>')+'</section>'+
+    '<p class="sub">'+esc(T('These alerts are checked every time you open the app. They disappear when the problem is fixed.'))+'</p>';
+}
+
+/* ---------- PAGE: menu ---------- */
+function menuItem(a,v,icon,t,s){return '<button data-a="'+a+'" data-v="'+v+'"><span class="ci">'+ic(icon,22)+'</span><span class="grow"><b>'+esc(t)+'</b><small>'+esc(s)+'</small></span>'+ic(I.chev,18)+'</button>';}
+function pageMenu(){
+  var debts=sum(debtList(),function(s){return s.balance;}),t0=startOfDay(Date.now());
+  var spent=sum(expensesBetween(t0,addDays(t0,1)),function(e){return e.amount;});
+  return pagehead(T('Menu'))+'<section class="card"><div class="menulist">'+
+    menuItem('page','notifications',I.bell,T('Notifications'),T('{n} alerts',{n:visibleAlerts().length}))+
+    menuItem('page','activity',I.activity,T('Activity'),T('Everything that happened in the app'))+
+    menuItem('page','expenses',I.wallet,T('Expenses'),T('Spent today: {n} Birr',{n:fmt(spent)}))+
+    menuItem('page','debts',I.users,T('Customers who owe'),T('{n} Birr owed',{n:fmt(debts)}))+
+    menuItem('page','slow',I.clock,T('Unsold stock'),T('Items unsold for {d}+ days',{d:slowDays()}))+
+    menuItem('page','settings',I.gear,T('Settings'),T('Language, theme, backup'))+'</div></section>';
+}
+
+/* ---------- PAGE: unsold stock ---------- */
+function pageSlow(){
+  var d=slowDays(),opts=SLOW_OPTIONS.slice();if(opts.indexOf(d)<0){opts.push(d);opts.sort(function(a,b){return a-b;});}
+  var su=slowUsed(),sn=slowNew(),sp=slowParts();
+  var tied=sum(su,function(u){return u.buy;})+sum(sn,function(i){return stock(i)*i.cost;})+sum(sp,function(p){return p.qty*p.cost;});
+  var newRowSlow=function(i){return '<button class="row" data-a="item" data-id="'+i.id+'"><span class="grow"><b>'+esc(i.name)+'</b><small>'+esc(T('No sale for {n} days',{n:daysSince(idleSince(i))}))+'</small></span><span class="end"><b class="num">'+stock(i)+'</b><small class="num">'+fmt(stock(i)*i.cost)+'</small></span></button>';};
+  var partRowSlow=function(p){return '<button class="row" data-a="part" data-id="'+p.id+'"><span class="grow"><b>'+esc(T(p.name))+'</b><small>'+esc(T(DEV_CAT_LABEL[p.cat]))+', '+esc(ageLabel(p.ts))+'</small></span><span class="end"><b class="num">'+p.qty+'</b><small class="num">'+fmt(p.qty*p.cost)+'</small></span></button>';};
+  var sec=function(title,list,fn){return list.length?'<section class="card flush"><div class="cardhead" style="padding-top:12px"><h3>'+esc(title)+' ('+list.length+')</h3></div>'+list.map(fn).join('')+'</section>':'';};
+  return pagehead(T('Unsold stock'))+
+    '<section class="card form"><label class="field" for="sdays">'+esc(T('Show items unsold for at least'))+'<select id="sdays" data-set="slowDays">'+opts.map(function(o){return '<option value="'+o+'"'+(o===d?' selected':'')+'>'+T('{n} days',{n:o})+'</option>';}).join('')+'</select></label>'+
+    '<div class="sum"><div class="l"><span>'+esc(T('Money tied up'))+'</span><span class="num">'+fmt(tied)+' '+esc(T('Birr'))+'</span></div></div><small>'+esc(T('This number is also used for the alerts and the Unsold card. You can change it any time.'))+'</small></section>'+
+    sec(T('Used devices'),su,usedRow)+sec(T('New items'),sn,newRowSlow)+sec(T('Spare parts'),sp,partRowSlow)+
+    ((su.length+sn.length+sp.length)?'':'<section class="card">'+emptyMsg(T('Nothing has been sitting for {d} days or more.',{d:d}))+'</section>');
+}
+
+/* ---------- PAGE: activity ---------- */
+var ACT_GROUPS={stock:['stock','used','part','price','decision'],sales:['sale','trade'],repair:['repair'],money:['expense','money'],fix:['undo','fix'],system:['system']};
+var ACT_ICON={stock:I.box,used:I.phone,part:I.chip,price:I.receipt,decision:I.star,sale:I.chart,trade:I.swap,repair:I.wrench,expense:I.wallet,money:I.wallet,undo:I.undo,fix:I.undo,system:I.gear};
+function actText(a){return T(a.k,a.v);}
+function actList(){
+  var q=state.actQ.trim().toLowerCase(),g=state.actFilter,list=db.activity.slice().sort(function(a,b){return b.ts-a.ts;});
+  if(g!=='all')list=list.filter(function(a){return ACT_GROUPS[g].indexOf(a.type)>=0;});
+  if(q)list=list.filter(function(a){return actText(a).toLowerCase().indexOf(q)>=0;});
+  list=list.slice(0,300);
+  if(!list.length)return emptyMsg(T('Nothing recorded yet.'));
+  var out='',cur='';
+  list.forEach(function(a){
+    var d=startOfDay(a.ts);if(d!==cur){cur=d;out+='<div class="dayhead"><span>'+esc(dayLabel(a.ts))+'</span><span></span></div>';}
+    out+='<div class="row" style="min-height:52px"><span style="flex:none;color:var(--accent)">'+ic(ACT_ICON[a.type]||I.activity,20)+'</span><span class="grow"><b style="font-weight:600">'+esc(actText(a))+'</b><small>'+esc(tfmt(a.ts))+'</small></span></div>';
+  });
+  return out;
+}
+function pageActivity(){
+  var opts=[{v:'all',t:T('All')},{v:'stock',t:T('Stock')},{v:'sales',t:T('Sales')},{v:'repair',t:T('Repair')},{v:'money',t:T('Money')},{v:'fix',t:T('Corrections')},{v:'system',t:T('App')}];
+  return pagehead(T('Activity'))+chipsRow(opts,state.actFilter,'setActFilter')+searchBox('aq',T('Search activity'),state.actQ,'actList')+'<section class="card flush" id="actList">'+actList()+'</section>';
+}
+
+/* ---------- PAGE: expenses ---------- */
+function expDay(){return fromYmd(state.expDate)||startOfDay(Date.now());}
+function pageExpenses(){
+  var d=expDay(),list=expensesBetween(d,addDays(d,1)),tot=sum(list,function(e){return e.amount;});
+  var stockSpent=sum(list.filter(function(e){return STOCK_EXP.indexOf(e.cat)>=0;}),function(e){return e.amount;});
+  var byCat={};list.forEach(function(e){byCat[e.cat]=(byCat[e.cat]||0)+e.amount;});
+  var isTd=d===startOfDay(Date.now());
+  var rows=list.map(function(e){
+    return '<button class="row" data-a="expense" data-id="'+e.id+'"><span class="grow"><b>'+esc(e.note||T(e.cat))+'</b><small>'+esc(T(e.cat))+' · '+esc(T(e.method))+' · '+esc(tfmt(e.ts))+'</small></span><span class="end"><b class="num">'+fmt(e.amount)+'</b></span></button>';
+  }).join('');
+  return pagehead(T('Expenses'),addBtn('expenseNew',T('Add expense')))+
+    '<div class="grid2" style="grid-template-columns:44px minmax(0,1fr) 44px;align-items:end"><button class="iconbtn" data-a="expDay" data-v="-1" aria-label="'+esc(T('Previous day'))+'">'+ic(I.back,20,2)+'</button>'+fInput('ed',T('Day'),{b:'expDate',type:'date',max:ymd(Date.now())})+'<button class="iconbtn" data-a="expDay" data-v="1" aria-label="'+esc(T('Next day'))+'">'+ic(I.chev,20,2)+'</button></div>'+
+    '<section class="card"><div class="label"><small>'+esc(isTd?T('Spent today'):T('Spent on {d}',{d:fmtDate(d)}))+'</small></div><div style="font-size:34px;font-weight:800;margin-top:4px" class="num">'+fmt(tot)+' <small style="font-size:15px">'+esc(T('Birr'))+'</small></div>'+
+    (tot?'<div class="sum" style="margin-top:10px"><div class="l"><span>'+esc(T('Buying stock and parts'))+'</span><span class="num">'+fmt(stockSpent)+'</span></div><div class="l"><span>'+esc(T('Running costs'))+'</span><span class="num">'+fmt(tot-stockSpent)+'</span></div></div>':'')+'</section>'+
+    (tot?'<section class="card"><h3>'+esc(T('By type'))+'</h3>'+Object.keys(byCat).map(function(k){return kv(T(k),'<b class="num">'+fmt(byCat[k])+'</b>');}).join('')+'</section>':'')+
+    '<section class="card flush">'+(rows||emptyMsg(T('No expenses on this day.')))+'</section>'+
+    '<p class="sub">'+esc(T('Trade-in values are not cash spent, so they do not appear here.'))+'</p>';
+}
+
+/* ---------- PAGE: customers who owe ---------- */
+function pageDebts(){
+  var list=debtList(),tot=sum(list,function(s){return s.balance;}),groups={},order=[];
+  list.forEach(function(s){var k=(s.customer||T('No name'))+(s.phone?' ('+s.phone+')':'');if(!groups[k]){groups[k]=[];order.push(k);}groups[k].push(s);});
+  var body=order.map(function(k){
+    var g=groups[k],t=sum(g,function(s){return s.balance;});
+    return '<section class="card flush"><div class="cardhead" style="padding-top:12px"><h3>'+esc(k)+'</h3><b class="num" style="color:var(--warn)">'+fmt(t)+'</b></div>'+g.map(function(s){return '<button class="row" data-a="sale" data-id="'+s.id+'"><span class="grow"><b>'+esc(saleTitle(s))+'</b><small>'+esc(whenLabel(s.ts))+' · '+esc(T('{n} days ago',{n:daysSince(s.ts)}))+'</small></span><span class="end"><b class="num">'+fmt(s.balance)+'</b><small>'+esc(T('of {n}',{n:fmt(s.price)}))+'</small></span></button>';}).join('')+'</section>';
+  }).join('');
+  return pagehead(T('Customers who owe'))+'<section class="card"><small>'+esc(T('Total owed to you'))+'</small><div style="font-size:30px;font-weight:800" class="num">'+fmt(tot)+' <small style="font-size:15px">'+esc(T('Birr'))+'</small></div></section>'+(body||'<section class="card">'+emptyMsg(T('Nobody owes you anything.'))+'</section>');
+}
+
+/* ---------- PAGE: settings ---------- */
+function pageSettings(){
+  var s=db.settings,swatches=Object.keys(PALETTES).map(function(k){
+    var p=PALETTES[k],dk=isDark(),c=p[dk?'dark':'light'];
+    return '<button type="button" class="swatch" data-a="setPalette" data-v="'+k+'" aria-pressed="'+(s.palette===k)+'"><span class="dots"><i style="background:'+c.hero+'"></i><i style="background:'+c.accent+'"></i><i style="background:'+c['accent-soft']+'"></i></span><span>'+esc(T(p.name))+(k==='teal'?' ('+esc(T('current'))+')':'')+'</span></button>';
+  }).join('');
+  var last=s.backupAt?T('Last backup: {n}',{n:fmtDate(s.backupAt)}):T('No backup yet.');
+  var json=JSON.stringify(db);
+  return pagehead(T('Settings'))+
+  '<section class="card form"><h3 style="margin:0">'+esc(T('Shop'))+'</h3><label class="field" for="shopn">'+esc(T('Shop name'))+'<input id="shopn" data-set="shop" value="'+esc(db.shop)+'" autocomplete="off" placeholder="'+esc(T('Your shop'))+'"></label></section>'+
+  '<section class="card form"><h3 style="margin:0">'+esc(T('Language'))+'</h3>'+segHtml([{v:'en',t:'English'},{v:'am',t:'አማርኛ'},{v:'om',t:'Afaan Oromoo'}],s.lang,'setLang')+'<small>'+esc(T('Translations are a first draft. Tell us which words to change.'))+'</small></section>'+
+  '<section class="card form"><h3 style="margin:0">'+esc(T('Appearance'))+'</h3>'+
+  '<div class="field">'+esc(T('Mode'))+'</div>'+segHtml([{v:'auto',t:T('Automatic')},{v:'light',t:T('Light')},{v:'dark',t:T('Dark')}],s.mode,'setMode')+
+  '<div class="field">'+esc(T('Background'))+'</div>'+'<div class="seg">'+['charcoal','black','navy'].map(function(k){return '<button type="button" data-a="setBg" data-v="'+k+'" aria-pressed="'+((s.bgStyle||'charcoal')===k)+'">'+k.charAt(0).toUpperCase()+k.slice(1)+'</button>';}).join('')+'</div>'+'<div class="field">'+esc(T('Your colors'))+'</div><div class="cpick"><label>'+esc(T('Main color'))+'<input type="color" data-col="cAccent" value="'+(s.cAccent||'#A98BFF')+'"></label><label>'+esc(T('Chart color'))+'<input type="color" data-col="cBar" value="'+s.cBar+'"></label></div><button class="btn wide" data-a="colReset">'+esc(T('Reset colors'))+'</button>'+
+  '<div class="field">'+esc(T('Color theme'))+'</div><div class="swatches">'+swatches+'</div>'+
+  '<div class="field">'+esc(T('Text size'))+'</div>'+segHtml([{v:'normal',t:T('Normal')},{v:'large',t:T('Large')}],s.textSize,'setSize')+'</section>'+
+  '<section class="card form"><h3 style="margin:0">'+esc(T('Stock and reports'))+'</h3>'+
+  '<label class="field" for="sl">'+esc(T('Count an item as slow-moving after (days)'))+'<input id="sl" data-set="slowDays" inputmode="numeric" value="'+s.slowDays+'" autocomplete="off"></label>'+
+  '<div class="field">'+esc(T('Week starts on'))+'</div>'+segHtml([{v:'1',t:T('Monday')},{v:'0',t:T('Sunday')},{v:'6',t:T('Saturday')}],String(s.weekStart),'setWeek')+'</section>'+
+  '<section class="card form"><h3 style="margin:0">'+esc(T('Backup'))+'</h3><p class="sub">'+esc(T('Your data is saved only in this browser on this phone. Make a backup often and keep it somewhere safe, for example in Telegram Saved Messages.'))+'</p><small>'+esc(last)+'</small>'+
+  '<button class="btn wide" data-a="downloadBackup">'+ic(I.download,18)+esc(T('Download backup file'))+'</button>'+
+  '<button class="btn wide" data-a="copyBackup">'+esc(T('Copy backup text'))+'</button>'+
+  '<label class="field" for="bk_out" hidden><span>'+esc(T('Backup text'))+'</span><textarea id="bk_out" readonly>'+esc(json)+'</textarea></label>'+
+  fArea('bk_in',T('Restore: paste backup text here'),{ph:T('Paste here')})+errBox()+
+  '<button class="btn wide" data-a="restore">'+esc(T('Restore from backup text'))+'</button><input type="file" id="bk_file" accept=".json,application/json,text/plain" hidden>'+
+  '<button class="btn wide" data-a="pickBackupFile">'+esc(T('Restore from backup file'))+'</button></section>'+
+  '<section class="card form"><h3 style="margin:0">'+esc(T('Export to Excel'))+'</h3><p class="sub">'+esc(T('Files open in Excel or Google Sheets.'))+'</p>'+
+  '<div class="grid2"><button class="btn sm" data-a="exportAll" data-v="sales">'+esc(T('All sales'))+'</button><button class="btn sm" data-a="exportAll" data-v="stock">'+esc(T('Stock'))+'</button><button class="btn sm" data-a="exportAll" data-v="expenses">'+esc(T('Expenses'))+'</button><button class="btn sm" data-a="exportAll" data-v="repairs">'+esc(T('Repairs'))+'</button></div></section>'+
+  (db.demo?'<section class="card form"><h3 style="margin:0">'+esc(T('Example data'))+'</h3><button class="btn wide" data-a="clearDemo">'+esc(T('Remove example data'))+'</button></section>':'')+
+  '<section class="card form"><h3 style="margin:0">'+esc(T('Danger zone'))+'</h3><button class="btn danger wide'+(state.armed==='reset'?' armed':'')+'" data-a="resetAll">'+esc(state.armed==='reset'?T('Tap again to erase everything'):T('Erase everything and start empty'))+'</button></section>';
+}
+
+/* Shop Stock sheets (part 1): stock items, used devices, spare parts, and their forms. Each sheet returns {title, body} or null when its record is gone. */
+var SHEETS={};
+var DEC_LABEL={priced:'Priced',undecided:'Undecided',parts:'For parts'};
+var PART_STATES=['tested','untested','faulty'];
+
+function btn(a,label,cls,o){
+  o=o||{};
+  return '<button type="button" class="btn'+(cls?' '+cls:'')+' wide" data-a="'+a+'"'+(o.id?' data-id="'+esc(o.id)+'"':'')+(o.v!=null?' data-v="'+esc(o.v)+'"':'')+(o.dis?' disabled':'')+'>'+(o.icon?ic(o.icon,18,2):'')+esc(label)+'</button>';
+}
+function btn2(a,b){return '<div class="btns">'+a+b+'</div>';}
+function decSeg(allowParts){
+  var o=[{v:'priced',t:T('Set a price')},{v:'undecided',t:T('Undecided')}];
+  if(allowParts)o.push({v:'parts',t:T('For parts')});
+  return '<div><div class="field" style="margin-bottom:6px">'+esc(T('Price decision'))+'</div>'+segHtml(o,F('f_dec','priced'),'fDec')+'</div>';
+}
+function methSeg(){return '<div><div class="field" style="margin-bottom:6px">'+esc(T('Paid by'))+'</div>'+segHtml(methodOpts(),F('f_m','Cash'),'fMeth')+'</div>';}
+function chkHtml(txt,isPhone,ign){
+  var a=analyzeSerials(txt,isPhone,ign),out='';
+  if(!a.list.length&&!a.dupInput.length)return '';
+  var hard=a.dupInput.length||a.inStock.length;
+  out+='<div class="'+(hard?'err':a.warn.length?'warnbox':'okbox')+'" style="font-weight:600">'+esc(T('{n} numbers entered',{n:a.list.length}))+'</div>';
+  var more=function(l){return l.slice(0,3).join(', ')+(l.length>3?' ...':'');};
+  if(a.dupInput.length)out+='<div class="err">'+esc(T('Repeated in your list: {n}',{n:more(a.dupInput)}))+'</div>';
+  if(a.inStock.length)out+='<div class="err">'+esc(T('Already in your stock: {n}',{n:more(a.inStock)}))+'</div>';
+  a.warn.slice(0,3).forEach(function(w){out+='<div class="warnbox">'+esc(w.w==='len'?T('{s} should have 15 digits but has {n}.',{s:w.s,n:w.s.length}):T('{s} does not pass the IMEI check. Please check for a typo.',{s:w.s}))+'</div>';});
+  return out;
+}
+function applyDecision(k,r,dec,price){
+  var key=k==='used'?'ask':'price',old=r[key]||0,od=r.decision,nm=k==='part'?T(r.name):r.name;
+  if(dec==='priced'){r[key]=price;r.decision='priced';if(old!==price)log('price','Price changed: {n} from {a} to {b} Birr',{n:nm,a:old?fmt(old):'-',b:fmt(price)});}
+  else{r[key]=0;r.decision=dec;if(od!==dec)log('decision','{n} is now marked: {d}',{n:nm,d:T(DEC_LABEL[dec])});}
+}
+function unitFilterBox(){return '<label class="search">'+ic(I.search,20)+'<input id="ufilter" type="search" placeholder="'+esc(T('Search IMEI or serial'))+'" aria-label="'+esc(T('Search IMEI or serial'))+'" data-live="unitFilter" autocomplete="off"></label>';}
+
+/* ---------- new item: details ---------- */
+SHEETS.item=function(s){
+  var i=find(db.items,s.id);if(!i)return null;
+  var n=stock(i),tags=[];
+  if(i.decision==='parts')tags.push({t:T('For parts'),k:'gray'});
+  else if(i.decision==='undecided'||!i.price)tags.push({t:T('Price undecided'),k:'warn'});
+  if(isLow(i))tags.push({t:n===0?T('Out of stock'):T('Low stock'),k:'bad'});
+  var last=lastSaleTs(i.id),body=tagsHtml(tags)+'<div>'+kv(T('Category'),esc(T(i.cat)))+kv(T('Selling price'),priceText(i.price,i.decision))+kv(T('Cost'),'<b class="num">'+fmt(i.cost)+'</b>')+kv(T('In stock'),'<b class="num">'+n+'</b>')+kv(T('Reorder at'),'<span class="num">'+i.reorder+'</span>')+kv(T('Last sale'),last?esc(dayLabel(last)):esc(T('Never')))+kv(T('Tracked by'),esc(i.track==='serial'?T('IMEI or serial'):T('Quantity')))+'</div>';
+  if(i.track==='serial'&&n){
+    body+='<div class="field">'+esc(T('IMEI or serial numbers'))+' ('+n+')</div>'+(n>6?unitFilterBox():'')+'<div class="unitlist">'+i.serials.map(function(x){return '<div class="unit" data-s="'+esc(x.toLowerCase())+'"><span class="mono" style="flex:1">'+esc(x)+'</span><button type="button" class="btn sm" data-a="unitRemove" data-id="'+i.id+'" data-v="'+esc(x)+'">'+esc(T('Remove'))+'</button></div>';}).join('')+'</div>';
+  }
+  body+='<div class="form">'+btn('sellItem',T('Sell'),'primary',{id:i.id,dis:!(n>0&&i.decision!=='parts'),icon:I.receipt})+
+    btn2(btn('restock',T('Add stock'),'',{id:i.id}),btn('itemEdit',T('Edit'),'',{id:i.id}))+
+    btn('decide',T('Set price or status'),'',{id:i.id,v:'item'})+
+    (i.track==='qty'?btn('correct',T('Correct the count'),'',{id:i.id,v:'item'}):'')+
+    btn('itemDel',T('Delete this item'),'danger',{id:i.id})+'</div>';
+  return {title:i.name,body:body};
+};
+
+/* ---------- new item: add or edit ---------- */
+function openItemForm(id){
+  var i=id?find(db.items,id):null;
+  openSheet({t:'itemForm',id:id||null},{f_name:i?i.name:'',f_cat:i?i.cat:'Phones',f_track:i?i.track:'serial',f_price:i&&i.price?String(i.price):'',f_cost:i&&i.cost?String(i.cost):'',f_reorder:i?String(i.reorder):'5',f_dec:i?i.decision:'priced',f_serials:'',f_qty:''});
+}
+SHEETS.itemForm=function(s){
+  var i=s.id?find(db.items,s.id):null;if(s.id&&!i)return null;
+  var cat=F('f_cat'),track=F('f_track'),dec=F('f_dec','priced');
+  var body='<div class="form">'+fInput('f_name',T('Name'),{ph:T('For example iPhone 15 128GB')})+
+    fSelect('f_cat',T('Category'),CATS.map(function(c){return {v:c,t:T(c)};}),{live:'rerender'})+
+    (i?'':'<div><div class="field" style="margin-bottom:6px">'+esc(T('How do you count it?'))+'</div>'+segHtml([{v:'serial',t:T('By IMEI or serial')},{v:'qty',t:T('By quantity')}],track,'fTrack')+'<small>'+esc(track==='serial'?T('Each unit has its own number, so you can see exactly which one was sold.'):T('For small things like cables and chargers.'))+'</small></div>')+
+    decSeg(true)+
+    fInput('f_price',T('Selling price (Birr)'),{im:'numeric',hid:dec!=='priced'})+
+    '<div class="grid2">'+fInput('f_cost',T('Cost each (Birr)'),{im:'numeric'})+fInput('f_reorder',T('Warn me at'),{im:'numeric'})+'</div>';
+  if(!i){
+    if(track==='serial')body+=fArea('f_serials',T('IMEI or serial numbers'),{live:'itemChk',ph:T('One per line'),hint:T('Add one number per line or separate them with commas. You can also add them later.')})+'<div id="f_chk" class="form">'+chkHtml(F('f_serials'),cat==='Phones')+'</div>';
+    else body+=fInput('f_qty',T('Quantity in stock'),{im:'numeric'});
+  }
+  body+=errBox()+btn('itemSave',T('Save'),'primary')+'</div>';
+  return {title:i?T('Edit item'):T('Add item'),body:body};
+};
+function itemSave(){
+  var s=state.sheet,i=s.id?find(db.items,s.id):null,f=state.f,now=Date.now();
+  var name=(f.f_name||'').trim(),dec=f.f_dec||'priced',price=num(f.f_price),cost=num(f.f_cost);
+  var reorder=String(f.f_reorder==null?'':f.f_reorder).trim()===''?5:Math.floor(num(f.f_reorder));
+  if(!name)return showErr(T('Enter a name.'));
+  if(dec==='priced'&&!price)return showErr(T('Enter a selling price, or choose Undecided.'));
+  if(!cost)return showErr(T('Enter what you paid for each unit.'));
+  if(i){
+    i.name=name;i.cat=f.f_cat;i.cost=cost;i.reorder=reorder;applyDecision('item',i,dec,price);
+    save();toast(T('Saved'));openSheet({t:'item',id:i.id});return;
+  }
+  var track=f.f_track||'serial',serials=[],qty=0;
+  if(track==='serial'){
+    var a=analyzeSerials(f.f_serials,f.f_cat==='Phones');
+    if(a.dupInput.length)return showErr(T('Repeated in your list: {n}',{n:a.dupInput.join(', ')}));
+    if(a.inStock.length)return showErr(T('Already in your stock: {n}',{n:a.inStock.join(', ')}));
+    if(a.warn.length&&!f._ack){f._ack=1;return showErr(T('Some numbers look wrong. Tap Save again to keep them anyway.'));}
+    serials=a.list;
+  }else qty=Math.floor(num(f.f_qty));
+  var it={id:uid(),name:name,cat:f.f_cat,track:track,price:dec==='priced'?price:0,cost:cost,reorder:reorder,serials:serials,qty:qty,decision:dec,ts:now};
+  db.items.push(it);
+  log('stock','Item added: {n} ({q} in stock)',{n:name,q:track==='serial'?serials.length:qty},now);
+  save();state.sheet=null;state.tab='stock';state.stockTab='new';state.newCat='All';state.q='';toast(T('Item added'));
+}
+
+/* ---------- add stock to an item ---------- */
+SHEETS.restock=function(s){
+  var i=find(db.items,s.id);if(!i)return null;
+  var body='<div class="form"><p class="sub">'+esc(T('Now in stock: {n}',{n:stock(i)}))+'</p>'+
+    (i.track==='serial'?fArea('f_serials',T('New IMEI or serial numbers'),{live:'itemChk',ph:T('One per line'),hint:T('Add one number per line or separate them with commas.')})+'<div id="f_chk" class="form">'+chkHtml(F('f_serials'),i.cat==='Phones')+'</div>':fInput('f_qty',T('How many arrived?'),{im:'numeric'}))+
+    errBox()+btn('restockSave',T('Add to stock'),'primary',{id:i.id})+'</div>';
+  return {title:T('Add stock')+': '+i.name,body:body};
+};
+function restockSave(id){
+  var i=find(db.items,id),f=state.f;if(!i)return;
+  if(i.track==='serial'){
+    var a=analyzeSerials(f.f_serials,i.cat==='Phones');
+    if(!a.list.length)return showErr(T('Enter at least one IMEI or serial number.'));
+    if(a.dupInput.length)return showErr(T('Repeated in your list: {n}',{n:a.dupInput.join(', ')}));
+    if(a.inStock.length)return showErr(T('Already in your stock: {n}',{n:a.inStock.join(', ')}));
+    if(a.warn.length&&!f._ack){f._ack=1;return showErr(T('Some numbers look wrong. Tap Save again to keep them anyway.'));}
+    i.serials=i.serials.concat(a.list);log('stock','Stock added: {n} +{q}',{n:i.name,q:a.list.length});toast(T('{n} units added',{n:a.list.length}));
+  }else{
+    var q=Math.floor(num(f.f_qty));if(q<1)return showErr(T('Enter how many arrived.'));
+    i.qty+=q;log('stock','Stock added: {n} +{q}',{n:i.name,q:q});toast(T('{n} added to stock',{n:q}));
+  }
+  save();openSheet({t:'item',id:id});
+}
+
+/* ---------- stock corrections (with a reason) ---------- */
+SHEETS.correct=function(s){
+  var r=s.k==='part'?find(db.parts,s.id):find(db.items,s.id);if(!r)return null;
+  var nm=s.k==='part'?T(r.name):r.name;
+  var body='<div class="form"><p class="sub">'+esc(T('The app says {n} in stock.',{n:r.qty}))+'</p>'+
+    fInput('f_newqty',T('Real count'),{im:'numeric',def:String(r.qty)})+
+    fSelect('f_reason',T('Reason'),[{v:'',t:T('Choose a reason')}].concat(optsFrom(REASONS_FIX)),{})+
+    errBox()+btn('correctSave',T('Save correction'),'primary',{id:r.id,v:s.k})+'</div>';
+  return {title:T('Correct the count')+': '+nm,body:body};
+};
+function correctSave(id,k){
+  var r=k==='part'?find(db.parts,id):find(db.items,id),f=state.f;if(!r)return;
+  var raw=String(f.f_newqty==null?r.qty:f.f_newqty).trim();
+  if(raw===''||!/^\d+$/.test(raw))return showErr(T('Enter the real count as a whole number.'));
+  if(!f.f_reason)return showErr(T('Choose a reason.'));
+  var q=parseInt(raw,10);
+  if(q===r.qty){state.sheet=null;return;}
+  correctQty(r,q,f.f_reason,k==='part'?T(r.name):r.name);
+  toast(T('Count corrected'));openSheet({t:k==='part'?'part':'item',id:id});
+}
+SHEETS.unitRemove=function(s){
+  var i=find(db.items,s.id);if(!i||i.serials.indexOf(s.serial)<0)return null;
+  var body='<div class="form"><p class="sub mono">'+esc(s.serial)+'</p><p class="sub">'+esc(T('Use this only if the unit is not really in your shop (lost, damaged, or returned). To undo a sale, use the sale instead.'))+'</p>'+
+    fSelect('f_reason',T('Reason'),[{v:'',t:T('Choose a reason')}].concat(optsFrom(REASONS_FIX)),{})+errBox()+btn('unitRemoveSave',T('Remove this unit'),'danger',{id:i.id,v:s.serial})+'</div>';
+  return {title:i.name,body:body};
+};
+
+/* ---------- price decision ---------- */
+function openDecide(k,id){
+  var r=k==='item'?find(db.items,id):k==='used'?find(db.used,id):find(db.parts,id);if(!r)return;
+  var price=k==='used'?r.ask:r.price;
+  openSheet({t:'decide',k:k,id:id},{f_dec:r.decision||'priced',f_price:price?String(price):''});
+}
+SHEETS.decide=function(s){
+  var r=s.k==='item'?find(db.items,s.id):s.k==='used'?find(db.used,s.id):find(db.parts,s.id);if(!r)return null;
+  var dec=F('f_dec','priced'),nm=s.k==='part'?T(r.name):r.name;
+  var body='<div class="form">'+decSeg(s.k!=='part')+fInput('f_price',T('Selling price (Birr)'),{im:'numeric',hid:dec!=='priced'})+
+    '<small>'+esc(dec==='undecided'?T('The item stays in your stock without a price. You will be reminded to decide.'):dec==='parts'?(s.k==='used'?T('Marked to be taken apart. Use Take apart on the device when you are ready.'):T('Marked as parts. It will not be offered for sale and will not count as low stock.')):T('The price is used when you add this to a sale. You can still change it during the sale.'))+'</small>'+
+    errBox()+btn('decideSave',T('Save'),'primary',{id:s.id,v:s.k})+'</div>';
+  return {title:nm,body:body};
+};
+function decideSave(id,k){
+  var r=k==='item'?find(db.items,id):k==='used'?find(db.used,id):find(db.parts,id),f=state.f;if(!r)return;
+  var dec=f.f_dec||'priced',price=num(f.f_price);
+  if(dec==='priced'&&!price)return showErr(T('Enter a selling price, or choose Undecided.'));
+  applyDecision(k,r,dec,price);save();toast(T('Saved'));openSheet({t:k,id:id});
+}
+
+/* ---------- used devices ---------- */
+SHEETS.used=function(s){
+  var u=find(db.used,s.id);if(!u)return null;
+  var tags=[];
+  if(u.status==='sold')tags.push({t:T('Sold'),k:'gray'});else if(u.status==='parts')tags.push({t:T('Taken apart'),k:'gray'});
+  else if(u.decision==='parts')tags.push({t:T('For parts'),k:'gray'});else if(u.decision==='undecided'||!u.ask)tags.push({t:T('Undecided'),k:'warn'});
+  if(u.source==='trade-in')tags.push({t:T('Trade-in'),k:'info'});
+  var body='<div style="display:flex;gap:12px;align-items:center"><span class="grade g'+u.grade+'">'+u.grade+'</span><div class="grow" style="min-width:0"><small>'+esc(T(GRADES[u.grade]))+'</small>'+tagsHtml(tags)+'</div></div><div>'+
+    kv(T('Type'),esc(T(DEV_CAT_LABEL[u.cat]||'Others')))+kv(T('IMEI or serial'),u.imei?'<span class="mono">'+esc(u.imei)+'</span>':esc(T('No IMEI or serial')))+
+    kv(T('Bought for'),'<b class="num">'+fmt(u.buy)+'</b>')+kv(T('Asking price'),priceText(u.ask,u.decision))+kv(T('Added'),esc(dfmt(u.ts,{month:'short',day:'numeric',year:'numeric'})+' ('+ageLabel(u.ts)+')'))+
+    (u.status==='sold'?kv(T('Sold for'),'<b class="num">'+fmt(u.soldPrice)+'</b>'):'')+(u.notes?kv(T('Notes'),esc(u.notes)):'')+'</div>';
+  var parts=db.parts.filter(function(p){return p.fromId===u.id;});
+  if(u.status==='parts')body+='<p class="sub">'+esc(T('{n} parts were taken from this device.',{n:parts.length}))+'</p>';
+  body+='<div class="form">';
+  if(u.status==='stock'){
+    body+=btn('sellUsed',T('Sell'),'primary',{id:u.id,icon:I.receipt})+btn2(btn('usedEdit',T('Edit'),'',{id:u.id}),btn('apartOpen',T('Take apart'),'',{id:u.id}))+btn('decide',T('Set price or status'),'',{id:u.id,v:'used'})+btn('usedDel',T('Delete this device'),'danger',{id:u.id});
+  }else if(u.status==='sold'){
+    body+=(u.saleId&&find(db.sales,u.saleId)?btn('sale',T('View the sale'),'primary',{id:u.saleId}):'');
+  }else{
+    body+=btn('undoApartOpen',T('Undo take apart'),'danger',{id:u.id,icon:I.undo});
+  }
+  body+='</div>';
+  return {title:u.name,body:body};
+};
+function openUsedForm(id){
+  var u=id?find(db.used,id):null;
+  openSheet({t:'usedForm',id:id||null},{f_name:u?u.name:'',f_cat:u?u.cat:'phone',f_imei:u?u.imei||'':'',f_grade:u?u.grade:'B',f_buy:u&&u.buy?String(u.buy):'',f_dec:u?(u.decision||'priced'):'priced',f_ask:u&&u.ask?String(u.ask):'',f_notes:u?u.notes||'':'',f_exp:'yes',f_m:'Cash'});
+}
+SHEETS.usedForm=function(s){
+  var u=s.id?find(db.used,s.id):null;if(s.id&&!u)return null;
+  var dec=F('f_dec','priced'),g=F('f_grade','B'),cat=F('f_cat','phone');
+  var body='<div class="form">'+fInput('f_name',T('Name'),{ph:T('For example Samsung A54')})+
+    fSelect('f_cat',T('Type of device'),DEV_CATS.map(function(x){return {v:x,t:T(DEV_CAT_LABEL[x])};}),{live:'rerender'})+
+    fInput('f_imei',T('IMEI or serial number'),{live:'usedChk',hint:T('Leave empty only if the device has no number.')})+'<div id="f_chk" class="form">'+chkHtml(F('f_imei'),cat==='phone',u?u.id:null)+'</div>'+
+    '<div><div class="field" style="margin-bottom:6px">'+esc(T('Condition'))+'</div><div class="chips" role="group" aria-label="'+esc(T('Condition'))+'">'+Object.keys(GRADES).map(function(x){return '<button type="button" class="chip" data-a="fGrade" data-v="'+x+'" aria-pressed="'+(g===x)+'">'+x+'</button>';}).join('')+'</div><small>'+esc(g)+': '+esc(T(GRADES[g]))+'</small></div>'+
+    fInput('f_buy',T('Bought for (Birr)'),{im:'numeric'})+decSeg(true)+fInput('f_ask',T('Asking price (Birr)'),{im:'numeric',hid:dec!=='priced'})+
+    fArea('f_notes',T('Notes'),{ph:T('Battery health, scratches, what is wrong')});
+  if(!u){
+    body+='<div><div class="field" style="margin-bottom:6px">'+esc(T('Record the purchase as an expense?'))+'</div>'+segHtml([{v:'yes',t:T('Yes')},{v:'no',t:T('No, it was a trade-in or gift')}],F('f_exp','yes'),'fExp')+'</div>'+(F('f_exp','yes')==='yes'?methSeg():'');
+  }
+  body+=errBox()+btn('usedSave',T('Save'),'primary')+'</div>';
+  return {title:u?T('Edit used device'):T('Add used device'),body:body};
+};
+function usedSave(){
+  var s=state.sheet,u=s.id?find(db.used,s.id):null,f=state.f,now=Date.now();
+  var name=(f.f_name||'').trim(),imei=(f.f_imei||'').trim(),dec=f.f_dec||'priced',ask=num(f.f_ask),buy=num(f.f_buy);
+  if(!name)return showErr(T('Enter a name.'));
+  if(dec==='priced'&&!ask)return showErr(T('Enter an asking price, or choose Undecided.'));
+  if(imei){
+    if(serialInUse(imei,u?u.id:null))return showErr(T('That IMEI or serial number is already in your stock: {n}',{n:imei}));
+    var w=serialWarn(imei,f.f_cat==='phone');
+    if(w&&!f._ack){f._ack=1;return showErr(T('Some numbers look wrong. Tap Save again to keep them anyway.'));}
+  }
+  if(u){
+    u.name=name;u.cat=f.f_cat;u.imei=imei;u.grade=f.f_grade;u.buy=buy;u.notes=(f.f_notes||'').trim();applyDecision('used',u,dec,ask);
+    save();toast(T('Saved'));openSheet({t:'used',id:u.id});return;
+  }
+  var d={id:uid(),name:name,cat:f.f_cat,imei:imei,grade:f.f_grade,buy:buy,ask:dec==='priced'?ask:0,decision:dec,notes:(f.f_notes||'').trim(),status:'stock',ts:now,source:f.f_exp==='yes'?'purchase':'other'};
+  db.used.push(d);
+  log('used','Used device added: {n}, bought for {p} Birr',{n:name,p:fmt(buy)},now);
+  if(f.f_exp==='yes'&&buy>0){db.expenses.push({id:uid(),ts:now,amount:buy,cat:'Used devices',note:name,method:f.f_m||'Cash',ref:{t:'used',id:d.id}});log('expense','Expense recorded: {c}, {n} Birr',{c:T('Used devices')+' - '+name,n:fmt(buy)},now);}
+  save();state.sheet=null;state.tab='stock';state.stockTab='used';state.usedStatus='stock';state.usedGrade='All';state.usedQ='';toast(T('Added to used stock'));
+}
+
+/* ---------- spare parts ---------- */
+SHEETS.part=function(s){
+  var p=find(db.parts,s.id);if(!p)return null;
+  var k=p.state==='tested'?'good':p.state==='faulty'?'bad':'warn',tags=[{t:T(cap(p.state)),k:k}];
+  if(p.qty>0&&(p.decision==='undecided'||!p.price))tags.push({t:T('Undecided'),k:'warn'});
+  var body=tagsHtml(tags)+'<div>'+kv(T('Category'),esc(T(DEV_CAT_LABEL[p.cat]||'Others')))+kv(T('In stock'),'<b class="num">'+p.qty+'</b>')+kv(T('Cost each'),'<b class="num">'+fmt(p.cost)+'</b>')+kv(T('Selling price'),priceText(p.price,p.decision==='parts'?'undecided':p.decision))+kv(T('From'),esc(p.from?T(p.from):T('unknown')))+kv(T('Added'),esc(ageLabel(p.ts)))+'</div>';
+  var uses=[];db.repairs.forEach(function(r){r.parts.forEach(function(rp){if(rp.partId===p.id)uses.push(r);});});
+  if(uses.length)body+='<p class="sub">'+esc(T('Used in {n} repairs.',{n:uses.length}))+'</p>';
+  body+='<div class="form">'+
+    (p.qty>0?btn2(btn('useInRepair',T('Used in Repair'),'primary',{id:p.id,icon:I.wrench}),btn('sellPart',T('Record Sale'),'primary',{id:p.id,icon:I.receipt})):'<p class="sub">'+esc(T('None left in stock.'))+'</p>')+
+    btn2(btn('partEdit',T('Edit'),'',{id:p.id}),btn('decide',T('Set price'),'',{id:p.id,v:'part'}))+
+    btn('correct',T('Correct the count'),'',{id:p.id,v:'part'})+btn('partDel',T('Delete this part'),'danger',{id:p.id})+'</div>';
+  return {title:T(p.name),body:body};
+};
+function openPartForm(id){
+  var p=id?find(db.parts,id):null;
+  openSheet({t:'partForm',id:id||null},{f_name:p?p.name:'',f_cat:p?p.cat:(state.partCat||'phone'),f_state:p?p.state:'tested',f_qty:p?String(p.qty):'1',f_cost:p&&p.cost?String(p.cost):'',f_dec:p&&p.decision==='priced'?'priced':(p?'undecided':'priced'),f_price:p&&p.price?String(p.price):'',f_from:p?p.from||'':'Bought directly',f_exp:'yes',f_m:'Cash'});
+}
+SHEETS.partForm=function(s){
+  var p=s.id?find(db.parts,s.id):null;if(s.id&&!p)return null;
+  var cat=F('f_cat','phone'),dec=F('f_dec','priced');
+  var names=PART_TYPES[cat]||[];
+  var body='<div class="form">'+fSelect('f_cat',T('Which device is it for?'),DEV_CATS.map(function(x){return {v:x,t:T(DEV_CAT_LABEL[x])};}),{live:'rerender'})+
+    '<datalist id="partnames">'+names.map(function(n){return '<option value="'+esc(n)+'">';}).join('')+'</datalist>'+
+    fInput('f_name',T('Part'),{list:'partnames',ph:T('For example Screen')})+
+    fSelect('f_state',T('Condition'),PART_STATES.map(function(x){return {v:x,t:T(cap(x))};}),{})+
+    (p?'':fInput('f_qty',T('Quantity'),{im:'numeric'}))+
+    fInput('f_cost',T('Cost each (Birr)'),{im:'numeric'})+
+    '<div><div class="field" style="margin-bottom:6px">'+esc(T('Price decision'))+'</div>'+segHtml([{v:'priced',t:T('Set a price')},{v:'undecided',t:T('Undecided')}],dec,'fDec')+'</div>'+
+    fInput('f_price',T('Selling price (Birr)'),{im:'numeric',hid:dec!=='priced'})+
+    fInput('f_from',T('Where is it from?'),{});
+  if(!p)body+='<div><div class="field" style="margin-bottom:6px">'+esc(T('Record the purchase as an expense?'))+'</div>'+segHtml([{v:'yes',t:T('Yes')},{v:'no',t:T('No')}],F('f_exp','yes'),'fExp')+'</div>'+(F('f_exp','yes')==='yes'?methSeg():'');
+  body+=errBox()+btn('partSave',T('Save'),'primary')+'</div>';
+  return {title:p?T('Edit part'):T('Add part'),body:body};
+};
+function partSave(){
+  var s=state.sheet,p=s.id?find(db.parts,s.id):null,f=state.f,now=Date.now();
+  var name=(f.f_name||'').trim(),dec=f.f_dec||'priced',price=num(f.f_price),cost=num(f.f_cost),qty=p?p.qty:Math.floor(num(f.f_qty));
+  if(!name)return showErr(T('Enter a name.'));
+  if(!p&&qty<1)return showErr(T('Enter how many you have.'));
+  if(dec==='priced'&&!price)return showErr(T('Enter a selling price, or choose Undecided.'));
+  var from=(f.f_from||'').trim();
+  if(p){
+    p.name=name;p.cat=f.f_cat;p.state=f.f_state;p.cost=cost;p.from=from;applyDecision('part',p,dec,price);
+    save();toast(T('Saved'));openSheet({t:'part',id:p.id});return;
+  }
+  var np={id:uid(),name:name,cat:f.f_cat,state:f.f_state,cost:cost,price:dec==='priced'?price:0,decision:dec,qty:qty,from:from,fromId:'',ts:now};
+  db.parts.push(np);
+  log('part','Spare part added: {n} x{q}',{n:T(name),q:qty},now);
+  if(f.f_exp!=='no'&&cost*qty>0){db.expenses.push({id:uid(),ts:now,amount:cost*qty,cat:'Spare parts',note:T(name)+(qty>1?' x'+qty:''),method:f.f_m||'Cash',ref:{t:'part',id:np.id}});log('expense','Expense recorded: {c}, {n} Birr',{c:T('Spare parts')+' - '+T(name),n:fmt(cost*qty)},now);}
+  save();state.sheet=null;state.tab='stock';state.stockTab='parts';state.partCat=np.cat;state.partStatus='stock';state.partType='All';state.partQ='';toast(T('Part added'));
+}
+
+/* ---------- use a part in a repair ---------- */
+SHEETS.useIn=function(s){
+  var p=s.partId?find(db.parts,s.partId):null,r=s.repairId?find(db.repairs,s.repairId):null;
+  if(s.partId&&!p)return null;if(s.repairId&&!r)return null;
+  var body='<div class="form">';
+  if(!p){
+    var ps=db.parts.filter(function(x){return x.qty>0;});
+    if(!ps.length)return {title:T('Use a part'),body:emptyMsg(T('No spare parts in stock.'))};
+    body+=fSelect('f_part',T('Part'),[{v:'',t:T('Choose a part')}].concat(ps.map(function(x){return {v:x.id,t:T(x.name)+' - '+T(DEV_CAT_LABEL[x.cat])+' ('+x.qty+')'};})),{});
+  }else body+='<p class="sub">'+esc(T(p.name))+' - '+esc(T('{n} in stock',{n:p.qty}))+'</p>';
+  if(!r){
+    var rs=db.repairs.filter(function(x){return x.status!=='delivered';});
+    if(!rs.length)return {title:T('Used in Repair'),body:emptyMsg(T('There are no open repair jobs.'))+btn('repairNew',T('New repair'),'primary')};
+    body+=fSelect('f_rep',T('Repair job'),[{v:'',t:T('Choose a repair job')}].concat(rs.map(function(x){return {v:x.id,t:x.device+' - '+(x.customer||T('No name'))};})),{});
+  }else body+='<p class="sub">'+esc(T('Repair job'))+': '+esc(r.device)+'</p>';
+  body+=fInput('f_uq',T('How many used?'),{im:'numeric',def:'1'})+errBox()+btn('useInSave',T('Save'),'primary')+'</div>';
+  return {title:T('Used in Repair'),body:body};
+};
+function useInSave(){
+  var s=state.sheet,f=state.f,pid=s.partId||f.f_part,rid=s.repairId||f.f_rep;
+  if(!pid)return showErr(T('Choose a part.'));if(!rid)return showErr(T('Choose a repair job.'));
+  var q=Math.floor(num(f.f_uq==null?1:f.f_uq));
+  var err=useInRepair(pid,rid,q);if(err)return showErr(err);
+  state.sheet=null;toast(T('Part used in the repair'));
+  if(s.repairId)openSheet({t:'repair',id:rid});
+}
+
+/* ---------- take a device apart ---------- */
+function openApart(devId){
+  var d=devId?find(db.used,devId):null;
+  state.apart={deviceId:d?d.id:'',rows:d?apartDefaults(d.cat):[]};
+  openSheet({t:'apart'});
+}
+SHEETS.apart=function(){
+  var a=state.apart;if(!a)return null;
+  var dev=find(db.used,a.deviceId),devs=usedInStock(),costs=apartCosts();
+  var body='<div class="form">'+fSelect('ap_dev',T('Device'),[{v:'',t:T('Choose a device')}].concat(devs.map(function(u){return {v:u.id,t:u.name+' ('+fmt(u.buy)+')'};})),{b:'apart.deviceId',live:'apartDev'});
+  if(dev){
+    body+='<p class="sub">'+esc(T('Bought for {n} Birr. The cost is split across the parts using the shares below.',{n:fmt(dev.buy)}))+'</p>';
+    body+=a.rows.map(function(r,idx){
+      return '<div class="cartline"><div class="top2"><b>'+esc(T('Part {n}',{n:idx+1}))+'</b><button type="button" class="iconbtn" data-a="apartRm" data-v="'+idx+'" aria-label="'+esc(T('Remove'))+'">'+ic(I.x,20,2)+'</button></div>'+
+        fInput('ap_n'+idx,T('Part'),{b:'apart.rows.'+idx+'.name',list:'partnames'})+
+        '<div class="grid2">'+fSelect('ap_s'+idx,T('Condition'),PART_STATES.map(function(x){return {v:x,t:T(cap(x))};}),{b:'apart.rows.'+idx+'.state'})+fInput('ap_h'+idx,T('Share of cost'),{b:'apart.rows.'+idx+'.share',im:'numeric',live:'apart'})+'</div>'+
+        '<small>'+esc(T('Cost'))+': <b class="num" id="apc'+idx+'">'+(r.name.trim()?fmt(costs[r.key]||0):'-')+'</b></small></div>';
+    }).join('')+'<datalist id="partnames">'+(PART_TYPES[dev.cat]||[]).map(function(n){return '<option value="'+esc(n)+'">';}).join('')+'</datalist>'+
+    btn('apartAdd',T('Add another part'),'',{icon:I.plus})+errBox()+btn('apartSave',T('Take apart and add parts to stock'),'primary');
+  }else body+=errBox();
+  return {title:T('Take a device apart'),body:body+'</div>'};
+};
+
+/* Shop Stock sheets (part 2): sales, undo, picking items for a sale, expenses, repairs, quick actions, confirm dialogs. */
+
+/* ---------- sale details ---------- */
+SHEETS.sale=function(s){
+  var x=find(db.sales,s.id);if(!x)return null;
+  var paidLater=sum(x.payments,function(p){return p.amount;}),paid=(x.cash||0)+paidLater;
+  var body=(s.done?'<div class="okbox">'+ic(I.check,20,2.4)+'<span>'+esc(s.done)+'</span></div>':'')+tagsHtml(saleTags(x));
+  body+='<div>'+kv(T('When'),esc(dfmt(x.ts,{weekday:'short',month:'short',day:'numeric',year:'numeric'})+', '+tfmt(x.ts)))+kv(T('Paid by'),esc(T(x.method)))+(x.customer?kv(T('Customer'),esc(x.customer)+(x.phone?' ('+esc(x.phone)+')':'')):'')+'</div>';
+  if(x.legacy&&!x.lines.length)body+='<div class="warnbox">'+esc(T('This is an older sale. It cannot be reversed automatically.'))+'</div>';
+  body+='<section class="card flush" style="padding-inline:12px">'+x.lines.map(function(l){
+    var sub=l.serial?'<small class="mono">'+esc(l.serial)+'</small>':'';
+    return '<div class="kv" style="align-items:flex-start"><span style="color:var(--ink)"><b>'+esc(l.kind==='part'?T(l.name):l.name)+'</b>'+(l.kind==='used'?' <small>('+esc(T('used'))+')</small>':'')+'<br>'+sub+'</span><span class="num" style="text-align:right">'+(l.kind==='repair'?fmt(l.price):l.qty+' x '+fmt(l.price))+'</span></div>';
+  }).join('')+'</section>';
+  if(x.trade)body+='<div class="warnbox" style="background:var(--accent-soft);color:var(--accent)">'+esc(T('Trade-in: {n}',{n:x.trade.name||''}))+' - '+fmt(x.trade.value)+' '+esc(T('Birr'))+'</div>';
+  body+='<div class="sum">'+(x.discount>0?'<div class="l"><span>'+esc(T('Subtotal'))+'</span><span class="num">'+fmt(x.subtotal)+'</span></div><div class="l"><span>'+esc(T('Discount'))+(x.discountReason?' ('+esc(T(x.discountReason))+')':'')+'</span><span class="num">- '+fmt(x.discount)+'</span></div>':'')+
+    '<div class="total"><span style="font-weight:700">'+esc(T('Total'))+'</span><b class="num">'+fmt(x.price)+' <small style="font-size:14px;font-weight:600">'+esc(T('Birr'))+'</small></b></div>'+
+    '<div class="l"><span>'+esc(T('Paid at the time of sale'))+'</span><span class="num">'+fmt(x.cash)+'</span></div>'+
+    x.payments.map(function(p){return '<div class="l"><span>'+esc(T('Payment on {d}',{d:fmtDate(p.ts)}))+' ('+esc(T(p.method))+')</span><span class="num">'+fmt(p.amount)+'</span></div>';}).join('')+
+    (x.balance>0&&!x.voided?'<div class="l"><span>'+esc(T('Still owed'))+'</span><span class="num" style="color:var(--warn);font-weight:700">'+fmt(x.balance)+'</span></div>':'')+
+    '<div class="l"><span>'+esc(T('Profit'))+'</span><span class="num">'+fmt(x.profit)+'</span></div></div>';
+  if(x.voided)body+='<div class="err">'+esc(T('This sale was reversed on {d}.',{d:fmtDate(x.voidedAt||x.ts)}))+(x.voidReason?' '+esc(T('Reason: {r}',{r:T(x.voidReason)})):'')+'</div>';
+  body+='<div class="form">';
+  if(!x.voided){
+    if(x.balance>0)body+=btn('payOpen',T('Receive a payment'),'primary',{id:x.id,icon:I.wallet});
+    body+=btn('shareReceipt',T('Share receipt'),'',{id:x.id,icon:I.share});
+    if(x.lines.length)body+=btn('undoSaleOpen',T('Undo this sale'),'danger',{id:x.id,icon:I.undo});
+  }else body+=btn('shareReceipt',T('Share receipt'),'',{id:x.id,icon:I.share});
+  body+='</div>';
+  return {title:saleTitle(x),body:body};
+};
+SHEETS.payment=function(s){
+  var x=find(db.sales,s.id);if(!x||x.balance<=0)return null;
+  return {title:T('Receive a payment'),body:'<div class="form"><p class="sub">'+esc(saleTitle(x))+' - '+esc(T('Still owed'))+': <b class="num">'+fmt(x.balance)+'</b></p>'+
+    fInput('f_amt',T('Amount received (Birr)'),{im:'numeric',def:String(x.balance)})+methSeg()+errBox()+btn('paySave',T('Save payment'),'primary',{id:x.id})+'</div>'};
+};
+
+/* ---------- undo a sale / undo a take-apart (with preview) ---------- */
+SHEETS.undoSale=function(s){
+  var x=find(db.sales,s.id);if(!x||x.voided)return null;
+  var pv=previewUndoSale(s.id);
+  return {title:T('Undo this sale'),body:'<div class="form"><p class="sub">'+esc(saleTitle(x))+' - '+fmt(x.price)+' '+esc(T('Birr'))+'</p>'+
+    '<small style="font-weight:700;color:var(--ink)">'+esc(T('If you continue, the app will:'))+'</small>'+okSteps(pv.steps)+
+    fSelect('f_reason',T('Reason'),[{v:'',t:T('Choose a reason')}].concat(optsFrom(REASONS_UNDO)),{})+errBox()+
+    btn('undoSaleGo',T('Yes, undo this sale'),'danger',{id:x.id})+btn('sale',T('Cancel'),'',{id:x.id})+'</div>'};
+};
+SHEETS.undoApart=function(s){
+  var d=find(db.used,s.id);if(!d||d.status!=='parts')return null;
+  var pv=previewUndoApart(s.id);
+  return {title:T('Undo take apart'),body:'<div class="form"><p class="sub">'+esc(d.name)+'</p><small style="font-weight:700;color:var(--ink)">'+esc(T('If you continue, the app will:'))+'</small>'+okSteps(pv.steps)+errBox()+
+    btn('undoApartGo',T('Yes, undo'),'danger',{id:d.id})+btn('used',T('Cancel'),'',{id:d.id})+'</div>'};
+};
+
+/* ---------- add to a sale ---------- */
+function inCartUsed(id){return state.cart.lines.some(function(l){return l.kind==='used'&&l.refId===id;});}
+function cartTaken(skipIdx){var t={};state.cart.lines.forEach(function(l,i){if(i!==skipIdx&&l.serial)t[l.serial]=1;});return t;}
+function pickList(){
+  var q=String(F('f_pq','')).trim().toLowerCase(),tab=state.pickTab,rows='';
+  if(tab==='new'){
+    db.items.filter(function(i){return stock(i)>0&&i.decision!=='parts'&&(!q||(i.name+' '+i.serials.join(' ')).toLowerCase().indexOf(q)>=0);}).forEach(function(i){
+      rows+='<button type="button" class="row" data-a="pickItem" data-k="new" data-id="'+i.id+'"><span class="grow"><b>'+esc(i.name)+'</b><small>'+stock(i)+' '+esc(T('in stock'))+'</small></span><span class="end">'+priceText(i.price,i.decision)+'</span></button>';
+    });
+  }else if(tab==='used'){
+    db.used.filter(function(u){return u.status==='stock'&&!inCartUsed(u.id)&&(!q||(u.name+' '+(u.imei||'')).toLowerCase().indexOf(q)>=0);}).forEach(function(u){
+      rows+='<button type="button" class="row" data-a="pickItem" data-k="used" data-id="'+u.id+'"><span class="grade g'+u.grade+'">'+u.grade+'</span><span class="grow"><b>'+esc(u.name)+'</b><small>'+esc(u.imei||T('No IMEI or serial'))+'</small></span><span class="end">'+priceText(u.ask,u.decision)+'</span></button>';
+    });
+  }else{
+    db.parts.filter(function(p){return p.qty>0&&(!q||(p.name+' '+T(p.name)+' '+(p.from||'')).toLowerCase().indexOf(q)>=0);}).forEach(function(p){
+      rows+='<button type="button" class="row" data-a="pickItem" data-k="part" data-id="'+p.id+'"><span class="grow"><b>'+esc(T(p.name))+'</b><small>'+esc(T(DEV_CAT_LABEL[p.cat]))+', '+p.qty+' '+esc(T('in stock'))+'</small></span><span class="end">'+priceText(p.price,p.decision==='parts'?'undecided':p.decision)+'</span></button>';
+    });
+  }
+  return rows||emptyMsg(T('Nothing found.'));
+}
+SHEETS.pick=function(){
+  return {title:T('Add item'),body:'<div class="form">'+segHtml([{v:'new',t:T('New')},{v:'used',t:T('Used')},{v:'part',t:T('Parts')}],state.pickTab,'pickTab')+
+    searchBox('f_pq',T('Search name or IMEI'),F('f_pq',''),'pickList')+'<section class="card flush" id="pickList" style="max-height:48vh;overflow-y:auto">'+pickList()+'</section></div>'};
+};
+SHEETS.units=function(s){
+  var it=find(db.items,s.id);if(!it)return null;
+  var multi=s.idx==null,taken=cartTaken(s.idx),cur=!multi&&state.cart.lines[s.idx]?[state.cart.lines[s.idx].serial]:[];
+  return {title:it.name,body:'<div class="form"><p class="sub">'+esc(multi?T('Choose the exact units the customer is buying. You can choose more than one.'):T('Choose the exact unit the customer is buying.'))+'</p>'+
+    unitListHtml(it,cur,multi,taken,'ufilter')+errBox()+btn('unitsGo',multi?T('Add to sale'):T('Use this unit'),'primary')+'</div>'};
+};
+function addToCart(kind,id,serial){
+  var c=state.cart,ex=null;
+  if(kind==='new'){
+    var it=find(db.items,id);if(!it)return;
+    if(it.track==='serial'){c.lines.push({kind:'new',refId:id,name:it.name,serial:serial||'',qty:1,price:it.price?String(it.price):''});return;}
+    c.lines.forEach(function(l){if(l.kind==='new'&&l.refId===id)ex=l;});
+    if(ex)ex.qty=Math.min(ex.qty+1,it.qty);else c.lines.push({kind:'new',refId:id,name:it.name,serial:'',qty:1,price:it.price?String(it.price):''});
+  }else if(kind==='used'){
+    var u=find(db.used,id);if(!u||inCartUsed(id))return;
+    c.lines.push({kind:'used',refId:id,name:u.name,serial:u.imei||'',qty:1,price:u.ask?String(u.ask):''});
+  }else{
+    var p=find(db.parts,id);if(!p)return;
+    c.lines.forEach(function(l){if(l.kind==='part'&&l.refId===id)ex=l;});
+    if(ex)ex.qty=Math.min(ex.qty+1,p.qty);else c.lines.push({kind:'part',refId:id,name:p.name,serial:'',qty:1,price:p.price?String(p.price):''});
+  }
+}
+
+/* ---------- quick actions (+ button) ---------- */
+SHEETS.quick=function(){
+  var q=function(a,icon,t,v){return '<button type="button" data-a="'+a+'"'+(v?' data-v="'+v+'"':'')+'><span class="ci">'+ic(icon,24)+'</span>'+esc(t)+'</button>';};
+  return {title:T('What do you want to do?'),body:'<div class="qa">'+q('openSale',I.receipt,T('New sale'))+q('page',I.swap,T('Trade-in'),'trade')+q('repairNew',I.wrench,T('New repair'))+q('expenseNew',I.wallet,T('Add expense'))+q('itemNew',I.box,T('Add item'))+q('usedNew',I.phone,T('Add used device'))+q('partNew',I.chip,T('Add part'))+q('page',I.users,T('Customers who owe'),'debts')+'</div>'};
+};
+
+/* ---------- expenses ---------- */
+SHEETS.expense=function(s){
+  var e=find(db.expenses,s.id);if(!e)return null;
+  var body='<div>'+kv(T('Amount'),'<b class="num">'+fmt(e.amount)+' '+esc(T('Birr'))+'</b>')+kv(T('Type'),esc(T(e.cat)))+kv(T('Paid by'),esc(T(e.method)))+kv(T('When'),esc(dfmt(e.ts,{weekday:'short',month:'short',day:'numeric',year:'numeric'})+', '+tfmt(e.ts)))+(e.note?kv(T('Note'),esc(e.note)):'')+'</div>';
+  if(e.ref)body+='<p class="sub">'+esc(T('This was added automatically when you added stock. Edit the stock record to change the price you paid.'))+'</p>';
+  body+='<div class="form">'+btn2(btn('expenseEdit',T('Edit'),'',{id:e.id}),btn('expenseDel',T('Delete'),'danger',{id:e.id}))+'</div>';
+  return {title:e.note||T(e.cat),body:body};
+};
+function openExpenseForm(id){
+  var e=id?find(db.expenses,id):null,d=e?e.ts:(state.expDate?fromYmd(state.expDate)+43200000:Date.now());
+  if(!e&&startOfDay(d)===startOfDay(Date.now()))d=Date.now();
+  openSheet({t:'expenseForm',id:id||null},{f_amt:e?String(e.amount):'',f_cat:e?e.cat:'Transport',f_note:e?e.note||'':'',f_m:e?e.method:'Cash',f_date:ymd(d)});
+}
+SHEETS.expenseForm=function(s){
+  var e=s.id?find(db.expenses,s.id):null;if(s.id&&!e)return null;
+  return {title:e?T('Edit expense'):T('Add expense'),body:'<div class="form">'+fInput('f_amt',T('Amount (Birr)'),{im:'numeric'})+fSelect('f_cat',T('Type'),optsFrom(EXP_CATS),{})+fInput('f_note',T('Note (optional)'),{ph:T('For example Taxi to the supplier')})+methSeg()+fInput('f_date',T('Date'),{type:'date',max:ymd(Date.now())})+errBox()+btn('expenseSave',T('Save'),'primary')+'</div>'};
+};
+
+/* ---------- repairs ---------- */
+SHEETS.repair=function(s){
+  var r=find(db.repairs,s.id);if(!r)return null;
+  var done=r.status==='delivered',k=r.status==='ready'?'good':done?'gray':r.status==='waiting'?'warn':'info';
+  var body=tagsHtml([{t:T(cap(r.status)),k:k}])+'<div>'+kv(T('Customer'),esc(r.customer||T('No name'))+(r.phone?' ('+esc(r.phone)+')':''))+kv(T('Device'),esc(r.device)+(r.imei?' <span class="mono">'+esc(r.imei)+'</span>':''))+kv(T('Problem'),esc(r.problem||'-'))+kv(T('Received'),esc(ageLabel(r.ts)))+
+    (done?kv(T('Fee'),'<b class="num">'+fmt(r.fee)+'</b>')+kv(T('Delivered'),esc(fmtDate(r.deliveredAt))):kv(T('Estimate'),'<b class="num">'+fmt(r.estimate)+'</b>'))+(r.notes?kv(T('Notes'),esc(r.notes)):'')+'</div>';
+  if(!done)body+='<div class="field">'+esc(T('Status'))+'</div>'+chipsRow(['received','diagnosing','waiting','ready'].map(function(x){return {v:x+'|'+r.id,t:T(cap(x))};}).map(function(o){return {v:o.v,t:o.t};}),r.status+'|'+r.id,'repairStatus');
+  body+='<div class="field">'+esc(T('Parts used'))+'</div><section class="card flush" style="padding-inline:12px">'+(r.parts.length?r.parts.map(function(p,i){return '<div class="kv" style="align-items:center"><span style="color:var(--ink)"><b>'+esc(T(p.name))+'</b>'+(p.qty>1?' x'+p.qty:'')+'<br><small>'+esc(T('cost'))+' '+fmt(p.cost*p.qty)+'</small></span>'+(done?'':'<button type="button" class="btn sm" data-a="repairPartRm" data-id="'+r.id+'" data-v="'+i+'">'+esc(T('Remove'))+'</button>')+'</div>';}).join(''):'<p class="empty" style="padding-block:10px">'+esc(T('No parts used yet.'))+'</p>')+'</section>';
+  if(done&&r.saleId)body+=kv(T('Parts cost'),'<span class="num">'+fmt(repairPartsCost(r)+(r.otherCost||0))+'</span>');
+  body+='<div class="form">';
+  if(!done)body+=btn('useInRepairFor',T('Use a spare part'),'',{id:r.id,icon:I.chip})+btn('deliverOpen',T('Hand over and take payment'),'primary',{id:r.id,icon:I.check})+btn2(btn('repairEdit',T('Edit'),'',{id:r.id}),btn('repairDel',T('Delete'),'danger',{id:r.id}));
+  else if(r.saleId&&find(db.sales,r.saleId))body+=btn('sale',T('View the sale'),'primary',{id:r.saleId});
+  body+='</div>';
+  return {title:r.device,body:body};
+};
+function openRepairForm(id){
+  var r=id?find(db.repairs,id):null;
+  openSheet({t:'repairForm',id:id||null},{f_cu:r?r.customer||'':'',f_ph:r?r.phone||'':'',f_dv:r?r.device:'',f_im:r?r.imei||'':'',f_pr:r?r.problem||'':'',f_es:r&&r.estimate?String(r.estimate):'',f_nt:r?r.notes||'':''});
+}
+SHEETS.repairForm=function(s){
+  var r=s.id?find(db.repairs,s.id):null;if(s.id&&!r)return null;
+  return {title:r?T('Edit repair'):T('New repair'),body:'<div class="form">'+customersList()+'<div class="grid2">'+fInput('f_cu',T('Customer name'),{list:'custlist'})+fInput('f_ph',T('Phone'),{type:'tel',im:'tel'})+'</div>'+fInput('f_dv',T('Device'),{ph:T('For example Samsung A12')})+fInput('f_im',T('IMEI or serial number (optional)'),{})+fInput('f_pr',T('Problem'),{ph:T('For example Cracked screen')})+fInput('f_es',T('Estimated price (Birr)'),{im:'numeric'})+fArea('f_nt',T('Notes'),{})+errBox()+btn('repairSave',T('Save'),'primary')+'</div>'};
+};
+SHEETS.deliver=function(s){
+  var r=find(db.repairs,s.id);if(!r||r.status==='delivered')return null;
+  var fee=num(F('f_fee',r.estimate)),oc=num(F('f_oc','')),pc=repairPartsCost(r),cost=pc+oc;
+  return {title:T('Hand over and take payment'),body:'<div class="form"><p class="sub">'+esc(r.device)+' - '+esc(r.customer||T('No name'))+'</p>'+
+    fInput('f_fee',T('Final price (Birr)'),{im:'numeric',def:String(r.estimate||''),live:'deliver'})+
+    '<div class="grid2">'+fInput('f_oc',T('Other costs (Birr)'),{im:'numeric',live:'deliver'})+fInput('f_paid',T('Paid now'),{im:'numeric',ph:T('Full amount'),live:'deliver'})+'</div>'+methSeg()+
+    '<div class="sum" id="deliverSum">'+deliverSum(r)+'</div>'+errBox()+btn('deliverGo',T('Confirm and record'),'primary',{id:r.id})+'</div>'};
+};
+function deliverSum(r){
+  var fee=num(F('f_fee',r.estimate)),oc=num(F('f_oc','')),pc=repairPartsCost(r),raw=String(F('f_paid','')).trim(),paid=raw===''?fee:Math.min(num(raw),fee);
+  return '<div class="l"><span>'+esc(T('Parts cost'))+'</span><span class="num">'+fmt(pc)+'</span></div><div class="l"><span>'+esc(T('Profit'))+'</span><span class="num">'+fmt(fee-pc-oc)+'</span></div>'+(fee>paid?'<div class="l"><span>'+esc(T('Still owed'))+'</span><span class="num" style="color:var(--warn);font-weight:700">'+fmt(fee-paid)+'</span></div>':'');
+}
+
+/* ---------- confirm dialog ---------- */
+function renderConf(){
+  var root=$('#confRoot'),c=state.conf;
+  if(!c){root.innerHTML='';return;}
+  root.innerHTML='<div class="scrim center" data-scrim="conf"><div class="panel" role="alertdialog" aria-modal="true" aria-label="'+esc(c.title)+'" tabindex="-1"><h2>'+esc(c.title)+'</h2>'+(c.msg?'<p class="sub" style="font-size:14px">'+esc(c.msg)+'</p>':'')+(c.html||'')+
+    '<div class="btns"><button type="button" class="btn" data-a="confNo">'+esc(T('Cancel'))+'</button><button type="button" class="btn '+(c.danger?'dangerfill':'primary')+'" data-a="confYes">'+esc(c.ok||T('Yes'))+'</button></div></div></div>';
+}
+function ask(o){state.conf=o;render();}
+
+/* Shop Stock actions: rendering, navigation and back button, taps, typing, form submits. */
+
+function toast(msg){var t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(function(){t.hidden=true;},2800);}
+function showErr(msg,id){
+  var el=document.querySelector(id?'#'+id:(state.sheet?'#sheetRoot #sheetErr':'#sheetErr'));
+  if(!el){toast(msg);return false;}
+  el.textContent=msg;el.hidden=false;try{el.scrollIntoView({block:'nearest'});}catch(e){}
+  return false;
+}
+function copyText(text,msg){
+  var done=function(){toast(msg||T('Copied'));};
+  var fb=function(){var ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(e){toast(T('Could not copy'));}document.body.removeChild(ta);};
+  try{navigator.clipboard.writeText(text).then(done,fb);}catch(e){fb();}
+}
+function shareText(text,msg){
+  try{if(navigator.share){navigator.share({text:text}).catch(function(){});return;}}catch(e){}
+  copyText(text,msg);
+}
+
+/* ---------- views ---------- */
+function tabView(){return state.tab==='home'?viewHome():state.tab==='stock'?viewStock():state.tab==='sales'?viewSales():viewRepair();}
+function pageView(p){
+  switch(p){
+    case 'sale':return pageSale();case 'trade':return pageTrade();case 'notifications':return pageNotifications();case 'menu':return pageMenu();
+    case 'slow':return pageSlow();case 'activity':return pageActivity();case 'expenses':return pageExpenses();case 'debts':return pageDebts();case 'settings':return pageSettings();
+  }
+  return pageMenu();
+}
+function navHtml(){
+  var b=function(t,icon,label){return '<button type="button" data-a="tab" data-v="'+t+'"'+(state.tab===t?' aria-current="page"':'')+'>'+ic(icon,24)+esc(label)+'</button>';};
+  return b('home',I.home,T('Home'))+b('stock',I.box,T('Stock'))+'<button type="button" class="mid" data-a="quick" aria-label="'+esc(T('Quick actions'))+'"><span class="disc">'+ic(I.plus,28,2.4)+'</span><span>'+esc(T('New'))+'</span></button>'+b('sales',I.chart,T('Sales'))+b('repair',I.wrench,T('Repair'));
+}
+var lastSheet=null,lastConf=null,lastKey='';
+function viewKey(){return state.tab+'|'+state.pages.join(',')+'|'+state.stockTab+'|'+state.partCat;}
+function renderSheet(){
+  var root=$('#sheetRoot'),s=state.sheet;
+  if(!s){root.innerHTML='';lastSheet=null;return;}
+  var def=SHEETS[s.t],r=def?def(s):null;
+  if(!r){state.sheet=null;root.innerHTML='';lastSheet=null;return;}
+  var old=root.querySelector('.panel'),st=old&&s===lastSheet?old.scrollTop:0;
+  root.innerHTML='<div class="scrim" data-scrim="sheet"><div class="panel" role="dialog" aria-modal="true" aria-label="'+esc(r.title)+'" tabindex="-1"><div class="head"><h2>'+esc(r.title)+'</h2><button type="button" class="iconbtn" data-a="closeSheet" aria-label="'+esc(T('Close'))+'">'+ic(I.x,22,2)+'</button></div>'+r.body+'</div></div>';
+  var p=root.querySelector('.panel');p.scrollTop=st;
+  if(s!==lastSheet)p.focus();
+  lastSheet=s;
+}
+function render(){
+  var y=window.scrollY,key=viewKey(),ae=document.activeElement,fid=ae&&ae.id?ae.id:'',a0=0,a1=0;
+  try{if(fid&&ae.selectionStart!=null){a0=ae.selectionStart;a1=ae.selectionEnd;}}catch(e){}
+  var top=state.pages.length?state.pages[state.pages.length-1]:null;
+  $('#app').innerHTML=top?pageView(top):tabView();
+  var nav=$('#nav');nav.hidden=!!top;if(!top)$('#navIn').innerHTML=navHtml();
+  document.body.classList.toggle('nonav',!!top);
+  renderSheet();renderConf();
+  if(fid){var n=document.getElementById(fid);if(n&&n!==document.activeElement){n.focus();try{n.setSelectionRange(a0,a1);}catch(e){}}}
+  if(state.conf&&state.conf!==lastConf){var cp=document.querySelector('#confRoot .panel');if(cp)cp.focus();}
+  lastConf=state.conf;
+  document.documentElement.style.overflow=(state.sheet||state.conf)?'hidden':'';
+  window.scrollTo(0,key===lastKey?y:0);lastKey=key;
+  syncHist();
+}
+
+/* ---------- navigation and the back button ---------- */
+var histN=0,histIgnore=0;
+function depth(){return (state.conf?1:0)+(state.sheet?1:0)+state.pages.length+(state.tab!=='home'?1:0)+(state.tab==='stock'&&state.stockTab==='parts'&&state.partCat!=null?1:0);}
+function backOnce(){
+  if(state.conf)state.conf=null;
+  else if(state.sheet)state.sheet=null;
+  else if(state.pages.length)state.pages.pop();
+  else if(state.tab==='stock'&&state.stockTab==='parts'&&state.partCat!=null)state.partCat=null;
+  else if(state.tab!=='home')state.tab='home';
+}
+function syncHist(){
+  if(histIgnore>0)return;
+  var d=depth();
+  try{
+    if(d>histN){while(histN<d){histN++;history.pushState({d:histN},'');}}
+    else if(d<histN){var n=histN-d;histN=d;histIgnore++;history.go(-n);}
+  }catch(e){}
+}
+window.addEventListener('popstate',function(e){
+  if(histIgnore>0){histIgnore--;if(!histIgnore)syncHist();return;}
+  histN=(e.state&&e.state.d)||0;
+  var g=20;while(depth()>histN&&g-->0)backOnce();
+  state.armed=null;render();
+});
+function openSheet(s,f){state.sheet=s;state.f=f||{};state.armed=null;render();}
+function pushPage(p){
+  state.pages.push(p);state.sheet=null;state.conf=null;state.f={};state.armed=null;
+  if(p==='notifications')markAlertsSeen();
+  if(p==='expenses'&&!state.expDate)state.expDate=ymd(Date.now());
+}
+function setTab(t){state.tab=t;state.pages=[];state.sheet=null;state.conf=null;state.f={};state.armed=null;}
+function ensureSalePage(){state.sheet=null;if(state.pages[state.pages.length-1]!=='sale')pushPage('sale');}
+function ask(o){state.conf=o;render();}
+
+/* ---------- live updates while typing (no full redraw) ---------- */
+var live={
+  newList:function(el){state.q=el.value;$('#newList').innerHTML=newList();},
+  usedList:function(el){state.usedQ=el.value;$('#usedList').innerHTML=usedList();},
+  partList:function(el){state.partQ=el.value;$('#partList').innerHTML=partList();},
+  salesBody:function(el){state.salesQ=el.value;$('#salesBody').innerHTML=salesBody();},
+  repairList:function(el){state.repairQ=el.value;$('#repairList').innerHTML=repairList();},
+  actList:function(el){state.actQ=el.value;$('#actList').innerHTML=actList();},
+  pickList:function(el){state.f.f_pq=el.value;$('#pickList').innerHTML=pickList();},
+  unitFilter:function(el){var q=el.value.trim().toLowerCase();[].forEach.call(document.querySelectorAll('.unit[data-s]'),function(u){u.hidden=!!q&&u.getAttribute('data-s').indexOf(q)<0;});},
+  cart:function(){
+    var c=state.cart,s=$('#cartSummary');if(s)s.innerHTML=cartSummaryHtml();
+    c.lines.forEach(function(l,i){
+      var r=lineRef(l),w=$('#lw'+i);if(!w)return;var p=num(l.price),m='';
+      if(p>0&&r){var cost=l.kind==='used'?r.buy:r.cost;if(p<cost)m='<div class="warnbox">'+esc(T('Below cost: you paid {n} for this.',{n:fmt(cost)}))+'</div>';}
+      w.innerHTML=m;
+    });
+    var lab=document.querySelector('label[for="cr"]');if(lab)lab.hidden=!(num(c.discount)>0);
+  },
+  trade:function(){var s=$('#tradeSummary');if(s)s.innerHTML=tradeSummary();},
+  tradeItem:function(){var it=find(db.items,state.trade.itemId);state.trade.serial='';state.trade.price=it&&it.price?String(it.price):'';render();},
+  itemChk:function(el){
+    var s=state.sheet,cat=s.t==='restock'?(find(db.items,s.id)||{}).cat:state.f.f_cat,b=$('#f_chk');
+    if(b)b.innerHTML=chkHtml(el.value,cat==='Phones');
+  },
+  usedChk:function(el){var b=$('#f_chk');if(b)b.innerHTML=chkHtml(el.value,state.f.f_cat==='phone',state.sheet.id);},
+  apart:function(){
+    var a=state.apart,costs=apartCosts();
+    a.rows.forEach(function(r,i){var e=$('#apc'+i);if(e)e.textContent=r.name.trim()?fmt(costs[r.key]||0):'-';});
+  },
+  apartDev:function(){var a=state.apart,d=find(db.used,a.deviceId);a.rows=d?apartDefaults(d.cat):[];render();},
+  deliver:function(){var e=$('#deliverSum'),r=find(db.repairs,state.sheet.id);if(e&&r)e.innerHTML=deliverSum(r);},
+  rerender:function(){render();}
+};
+
+document.addEventListener('input',function(e){
+  var el=e.target;
+  if(el.hasAttribute('data-b'))setPath(state,el.getAttribute('data-b'),el.value);
+  else if(el.hasAttribute('data-f')){state.f[el.id]=el.value;state.f._ack=0;}
+  if(el.tagName==='SELECT')return;
+  var l=el.getAttribute('data-live');if(l&&live[l])live[l](el);
+});
+document.addEventListener('change',function(e){
+  var el=e.target;
+  try{
+    if(el.hasAttribute('data-unit')){if(!state.sheet){state.trade.serial=el.value;live.trade();}return;}
+    if(el.hasAttribute('data-set')){doSet(el);return;}
+    if(el.id==='bk_file'){readBackupFile(el);return;}
+    if(el.type==='date'&&el.hasAttribute('data-b')){render();return;}
+    var l=el.getAttribute('data-live');if(l&&el.tagName==='SELECT'&&live[l])live[l](el);
+  }catch(err){console.error(err);toast(T('Something went wrong. Please try again.'));}
+});
+function doSet(el){
+  var k=el.getAttribute('data-set');
+  if(k==='shop'){db.shop=el.value.trim();save();toast(T('Saved'));render();}
+  else if(k==='slowDays'){db.settings.slowDays=Math.max(1,Math.min(365,Math.floor(num(el.value))||30));save();render();}
+}
+
+/* ---------- backup ---------- */
+function backupStamp(){db.settings.backupAt=Date.now();log('system','Backup saved');save();}
+function readBackupFile(el){
+  var f=el.files&&el.files[0];if(!f)return;
+  var r=new FileReader();r.onload=function(){restoreFrom(String(r.result||''));el.value='';};r.onerror=function(){toast(T('Could not read that file.'));};r.readAsText(f);
+}
+function restoreFrom(text){
+  var o=null;try{o=migrate(JSON.parse(text));}catch(e){}
+  if(!o)return showErr(T('That is not a valid backup.'));
+  ask({title:T('Restore this backup?'),msg:T('This replaces everything on this phone with the backup: {a} devices, {b} sales.',{a:o.items.length+o.used.length,b:o.sales.length}),ok:T('Yes, restore'),danger:true,fn:function(){
+    db=o;log('system','Backup restored');save();applyTheme();setTab('home');toast(T('Backup restored'));
+  }});
+}
+
+/* ---------- sale and trade-in: confirm, then record ---------- */
+function doRecordSale(){
+  var res=recordSale();
+  if(res.err){toast(res.err);return;}
+  if(state.pages[state.pages.length-1]==='sale')state.pages.pop();
+  openSheet({t:'sale',id:res.sale.id,done:T('Sale recorded.')});
+}
+function doTrade(){
+  var res=recordTrade();
+  if(res.err){toast(res.err);return;}
+  var m=state.trade.method;state.trade=freshTrade(m);
+  if(state.pages[state.pages.length-1]==='trade')state.pages.pop();
+  openSheet({t:'sale',id:res.sale.id,done:T('Trade-in recorded.')});
+}
+function goAlert(g){
+  if(!g)return;
+  if(g.a==='page'){pushPage(g.v);return;}
+  if(g.a==='undecided'){
+    if(undecidedNew().length){setTab('stock');state.stockTab='new';state.newCat='Undecided';state.q='';}
+    else if(undecidedUsed().length){setTab('stock');state.stockTab='used';state.usedStatus='stock';state.usedGrade='Undecided';state.usedQ='';}
+    else{setTab('stock');state.stockTab='parts';state.partCat=undecidedParts().length?undecidedParts()[0].cat:null;state.partStatus='stock';}
+    return;
+  }
+  openSheet({t:g.a,id:g.id});
+}
+function reorderText(){
+  var L=[(db.shop||T('Your shop'))+' - '+T('Reorder list')+' ('+fmtDate(Date.now())+')'];
+  db.items.filter(isLow).forEach(function(i){L.push('- '+i.name+': '+T('{n} left, reorder at {r}',{n:stock(i),r:i.reorder}));});
+  return L.join('\n');
+}
+
+/* ---------- taps ---------- */
+function act(a,el){
+  var id=el.getAttribute('data-id'),v=el.getAttribute('data-v'),k=el.getAttribute('data-k');
+  if(a!=='resetAll')state.armed=null;
+  switch(a){
+    /* navigation */
+    case 'tab':setTab(v);break;
+    case 'quick':openSheet({t:'quick'});return false;
+    case 'page':pushPage(v);break;
+    case 'back':if(histN>0){history.back();return false;}backOnce();break;
+    case 'closeSheet':state.sheet=null;break;
+    case 'confNo':state.conf=null;break;
+    case 'confYes':var fn=state.conf&&state.conf.fn;state.conf=null;if(fn)fn();break;
+    case 'goSales':setTab('sales');state.salesPeriod=v;state.salesQ='';break;
+    case 'goLow':setTab('stock');state.stockTab='new';state.newCat='Low';state.q='';break;
+    case 'goUsed':setTab('stock');state.stockTab='used';break;
+    case 'goParts':setTab('stock');state.stockTab='parts';state.partCat=null;break;
+    case 'goRepair':setTab('repair');break;
+    case 'openSale':pushPage('sale');break;
+    case 'alertGo':var al=computeAlerts().filter(function(x){return x.key===k;})[0];if(al)goAlert(al.go);break;
+    case 'alertHide':db.alertsDismissed[k]=Date.now();save();break;
+    case 'shareReorder':shareText(reorderText(),T('Reorder list copied'));return false;
+    /* open records */
+    case 'sale':case 'item':case 'used':case 'part':case 'repair':case 'expense':openSheet({t:a,id:id});return false;
+    case 'itemNew':openItemForm();return false;case 'usedNew':openUsedForm();return false;case 'partNew':openPartForm();return false;
+    case 'repairNew':openRepairForm();return false;case 'expenseNew':openExpenseForm();return false;
+    case 'itemEdit':openItemForm(id);return false;case 'usedEdit':openUsedForm(id);return false;case 'partEdit':openPartForm(id);return false;
+    case 'repairEdit':openRepairForm(id);return false;case 'expenseEdit':openExpenseForm(id);return false;
+    case 'restock':openSheet({t:'restock',id:id},{f_serials:'',f_qty:''});return false;
+    case 'decide':openDecide(v,id);return false;
+    case 'correct':openSheet({t:'correct',id:id,k:v},{});return false;
+    case 'unitRemove':openSheet({t:'unitRemove',id:id,serial:v},{});return false;
+    case 'apartOpen':openApart(id);return false;
+    case 'undoApartOpen':openSheet({t:'undoApart',id:id},{});return false;
+    case 'undoSaleOpen':openSheet({t:'undoSale',id:id},{f_reason:''});return false;
+    case 'payOpen':var ps=find(db.sales,id);openSheet({t:'payment',id:id},{f_amt:String(ps.balance),f_m:'Cash'});return false;
+    case 'useInRepair':openSheet({t:'useIn',partId:id},{f_rep:'',f_uq:'1'});return false;
+    case 'useInRepairFor':openSheet({t:'useIn',repairId:id},{f_part:'',f_uq:'1'});return false;
+    case 'deliverOpen':var rd=find(db.repairs,id);openSheet({t:'deliver',id:id},{f_fee:String(rd.estimate||''),f_oc:'',f_paid:'',f_m:'Cash'});return false;
+    /* lists and filters */
+    case 'stockTab':state.stockTab=v;break;
+    case 'setNewCat':state.newCat=v;break;
+    case 'setUsedStatus':state.usedStatus=v;break;
+    case 'setUsedGrade':state.usedGrade=v;break;
+    case 'partCat':state.partCat=v===''?null:v;state.partType='All';state.partQ='';break;
+    case 'setPartStatus':state.partStatus=v;break;
+    case 'setPartType':state.partType=v;break;
+    case 'salesPeriod':state.salesPeriod=v;if(v==='date'&&!state.salesDate)state.salesDate=ymd(Date.now());if(v==='range'){if(!state.salesFrom)state.salesFrom=ymd(addDays(Date.now(),-6));if(!state.salesTo)state.salesTo=ymd(Date.now());}break;
+    case 'toggleVoid':state.salesVoid=!state.salesVoid;break;
+    case 'setRepairFilter':state.repairFilter=v;break;
+    case 'setActFilter':state.actFilter=v;break;
+    case 'expDay':var d=addDays(expDay(),Number(v));if(d>startOfDay(Date.now()))d=startOfDay(Date.now());state.expDate=ymd(d);break;
+    case 'pickTab':state.pickTab=v;break;
+    /* form helpers */
+    case 'fGrade':state.f.f_grade=v;break;
+    case 'fDec':state.f.f_dec=v;break;
+    case 'fTrack':state.f.f_track=v;break;
+    case 'fExp':state.f.f_exp=v;break;
+    case 'fMeth':state.f.f_m=v;break;
+    /* saving */
+    case 'itemSave':return itemSave();
+    case 'restockSave':return restockSave(id);
+    case 'correctSave':return correctSave(id,v);
+    case 'decideSave':return decideSave(id,v);
+    case 'usedSave':return usedSave();
+    case 'partSave':return partSave();
+    case 'useInSave':return useInSave();
+    case 'unitRemoveSave':
+      var it=find(db.items,id);if(!state.f.f_reason)return showErr(T('Choose a reason.'));
+      removeUnit(it,v,state.f.f_reason);toast(T('Unit removed'));openSheet({t:'item',id:id});return false;
+    case 'apartAdd':state.apart.rows.push({key:uid(),name:'',state:'untested',share:'1'});break;
+    case 'apartRm':state.apart.rows.splice(Number(v),1);break;
+    case 'apartSave':
+      var dv=find(db.used,state.apart.deviceId),er=takeApart();if(er)return showErr(er);
+      state.sheet=null;state.apart=null;setTab('stock');state.stockTab='parts';state.partCat=dv.cat;state.partStatus='stock';state.partType='All';state.partQ='';toast(T('Parts added to stock'));break;
+    case 'repairSave':return repairSave();
+    case 'expenseSave':return expenseSave();
+    case 'repairStatus':
+      var sp=v.split('|'),rr=find(db.repairs,sp[1]);if(rr&&rr.status!==sp[0]){rr.status=sp[0];if(sp[0]==='ready')rr.readyAt=Date.now();log('repair','Repair status: {d} is now {s}',{d:rr.device,s:T(cap(sp[0]))});save();}
+      break;
+    case 'repairPartRm':var rp=find(db.repairs,id);if(rp)removePartFromRepair(rp,Number(v));break;
+    case 'deliverGo':return deliverGo(id);
+    case 'paySave':
+      var sx=find(db.sales,id),amt=num(state.f.f_amt);if(!amt)return showErr(T('Enter the amount received.'));
+      addPayment(sx,amt,state.f.f_m||'Cash');toast(T('Payment saved'));openSheet({t:'sale',id:id});return false;
+    case 'undoSaleGo':
+      if(!state.f.f_reason)return showErr(T('Choose a reason.'));
+      try{realRun(undoSaleFn(id),state.f.f_reason);}catch(e){console.error(e);toast(T('Something went wrong. Nothing was changed.'));break;}
+      toast(T('Sale reversed'));openSheet({t:'sale',id:id});return false;
+    case 'undoApartGo':
+      try{realRun(undoApartFn(id));}catch(e2){console.error(e2);toast(T('Something went wrong. Nothing was changed.'));break;}
+      toast(T('Take apart undone'));openSheet({t:'used',id:id});return false;
+    case 'shareReceipt':shareText(receiptText(find(db.sales,id)),T('Receipt copied'));return false;
+    /* delete */
+    case 'itemDel':var di=find(db.items,id);ask({title:T('Delete this item?'),msg:di.name,ok:T('Delete'),danger:true,fn:function(){db.items=db.items.filter(function(x){return x.id!==id;});log('stock','Item deleted: {n}',{n:di.name});save();state.sheet=null;toast(T('Deleted'));}});return false;
+    case 'usedDel':var du=find(db.used,id);ask({title:T('Delete this device?'),msg:du.name,ok:T('Delete'),danger:true,fn:function(){removeUsed(du);log('used','Used device deleted: {n}',{n:du.name});save();state.sheet=null;toast(T('Deleted'));}});return false;
+    case 'partDel':var dp=find(db.parts,id);ask({title:T('Delete this part?'),msg:T(dp.name),ok:T('Delete'),danger:true,fn:function(){db.parts=db.parts.filter(function(x){return x.id!==id;});log('part','Spare part deleted: {n}',{n:T(dp.name)});save();state.sheet=null;toast(T('Deleted'));}});return false;
+    case 'expenseDel':var de=find(db.expenses,id);ask({title:T('Delete this expense?'),msg:(de.note||T(de.cat))+' - '+fmt(de.amount)+' '+T('Birr'),ok:T('Delete'),danger:true,fn:function(){db.expenses=db.expenses.filter(function(x){return x.id!==id;});log('expense','Expense deleted: {c}, {n} Birr',{c:T(de.cat)+(de.note?' - '+de.note:''),n:fmt(de.amount)});save();state.sheet=null;toast(T('Deleted'));}});return false;
+    case 'repairDel':var dr=find(db.repairs,id);ask({title:T('Delete this repair?'),msg:dr.device,ok:T('Delete'),danger:true,fn:function(){for(var i=dr.parts.length-1;i>=0;i--)removePartFromRepair(dr,i);db.repairs=db.repairs.filter(function(x){return x.id!==id;});log('repair','Repair deleted: {d}',{d:dr.device});save();state.sheet=null;toast(T('Deleted'));}});return false;
+    /* selling */
+    case 'sellItem':
+      var si=find(db.items,id);
+      if(si.track==='serial'){openSheet({t:'units',id:id,idx:null,go:true},{});return false;}
+      addToCart('new',id);ensureSalePage();toast(T('Added to the sale'));break;
+    case 'sellUsed':addToCart('used',id);ensureSalePage();toast(T('Added to the sale'));break;
+    case 'sellPart':addToCart('part',id);ensureSalePage();toast(T('Added to the sale'));break;
+    case 'cartAdd':openSheet({t:'pick'},{f_pq:''});return false;
+    case 'pickItem':
+      if(k==='new'&&find(db.items,id).track==='serial'){openSheet({t:'units',id:id,idx:null,go:false},{});return false;}
+      addToCart(k,id);state.sheet=null;toast(T('Added to the sale'));break;
+    case 'unitsGo':
+      var us=state.sheet,picked=[].map.call(document.querySelectorAll('#sheetRoot [data-unit]:checked'),function(x){return x.value;});
+      if(!picked.length)return showErr(T('Choose at least one unit.'));
+      if(us.idx!=null)state.cart.lines[us.idx].serial=picked[0];else picked.forEach(function(s){addToCart('new',us.id,s);});
+      state.sheet=null;if(us.go)ensureSalePage();break;
+    case 'cartRm':state.cart.lines.splice(Number(v),1);break;
+    case 'cartQty':
+      var pr=v.split(':'),ln=state.cart.lines[Number(pr[0])],rf=lineRef(ln),mx=rf?(ln.kind==='used'||(ln.kind==='new'&&rf.track==='serial')?1:rf.qty):1;
+      ln.qty=Math.max(1,Math.min(ln.qty+Number(pr[1]),mx));break;
+    case 'cartPick':openSheet({t:'units',id:state.cart.lines[Number(v)].refId,idx:Number(v)},{});return false;
+    case 'cartMethod':state.cart.method=v;break;
+    case 'cartGo':
+      var ce=cartError(state.cart);if(ce)return showErr(ce,'cartErr');
+      ask({title:T('Record this sale?'),msg:T('Are you sure you want to record this sale?'),html:cartSummaryHtml(),ok:T('Yes, record sale'),fn:doRecordSale});return false;
+    case 'tradeGrade':state.trade.grade=v;break;
+    case 'tradeMethod':state.trade.method=v;break;
+    case 'tradeGo':
+      var tc=tradeCalc();if(tc.miss.length)return showErr(T('Still needed: {n}.',{n:tc.miss.join(', ')}),'tradeErr');
+      var ti=state.trade.imei.trim();if(ti&&serialInUse(ti))return showErr(T('That IMEI or serial number is already in your stock: {n}',{n:ti}),'tradeErr');
+      ask({title:T('Confirm trade-in?'),msg:T('Are you sure you want to record this trade-in?'),html:tradeSummary(),ok:T('Yes, record it'),fn:doTrade});return false;
+    /* settings */
+    case 'setLang':db.settings.lang=v;save();applyTheme();break;
+    case 'setBg':db.settings.bgStyle=v;save();applyTheme();render();break;
+    case 'colReset':db.settings.cAccent='';db.settings.cBar='#6EA8FE';db.settings.bgStyle='charcoal';save();applyTheme();render();break;
+    case 'setMode':db.settings.mode=v;save();applyTheme();break;
+    case 'setPalette':db.settings.palette=v;save();applyTheme();break;
+    case 'setSize':db.settings.textSize=v;save();applyTheme();break;
+    case 'setWeek':db.settings.weekStart=Number(v);save();break;
+    case 'downloadBackup':if(downloadFile('shop-stock-backup-'+ymd(Date.now())+'.json',JSON.stringify(db),'application/json')){backupStamp();toast(T('Backup file saved'));}else toast(T('Could not save the file. Use Copy backup text instead.'));break;
+    case 'copyBackup':copyText(JSON.stringify(db),T('Backup copied'));backupStamp();break;
+    case 'restore':var txt=(state.f.bk_in||'').trim();if(!txt)return showErr(T('Paste your backup text first.'));return restoreFrom(txt);
+    case 'pickBackupFile':var bf=$('#bk_file');if(bf)bf.click();return false;
+    case 'exportSales':
+      var rg=periodRange(state.salesPeriod),sl=salesBetween(rg[0],rg[1],state.salesVoid);if(state.salesQ.trim())sl=sl.filter(function(s){return saleMatches(s,state.salesQ);});
+      downloadFile('sales-'+ymd(rg[0])+'.csv',salesCsv(sl));return false;
+    case 'exportAll':
+      var csv=v==='sales'?salesCsv(db.sales.slice().sort(function(x,y){return x.ts-y.ts;})):v==='stock'?stockCsv():v==='expenses'?expensesCsv():repairsCsv();
+      downloadFile(v+'-'+ymd(Date.now())+'.csv',csv);return false;
+    case 'clearDemo':
+      ask({title:T('Remove the example data?'),msg:T('Your own entries stay.'),ok:T('Remove'),danger:true,fn:function(){
+        var keep=function(x){return !x.demo;};
+        db.items=db.items.filter(keep);db.used=db.used.filter(keep);db.parts=db.parts.filter(keep);db.sales=db.sales.filter(keep);db.repairs=db.repairs.filter(keep);db.expenses=db.expenses.filter(keep);db.activity=db.activity.filter(keep);
+        db.demo=false;save();toast(T('Example data removed'));
+      }});return false;
+    case 'resetAll':
+      if(state.armed==='reset'){var keepSet=db.settings;db=emptyDb();db.settings=keepSet;save();setTab('home');state.trade=freshTrade();state.cart=freshCart();toast(T('Everything erased'));}
+      else{state.armed='reset';clearTimeout(act.t);act.t=setTimeout(function(){if(state.armed==='reset'){state.armed=null;render();}},4000);}
+      break;
+    default:return false;
+  }
+}
+document.addEventListener('click',function(e){
+  var t=e.target;
+  if(t.hasAttribute&&t.hasAttribute('data-scrim')){if(state.conf)state.conf=null;else state.sheet=null;render();return;}
+  var el=t.closest?t.closest('[data-a]'):null;if(!el||el.disabled)return;
+  var r;
+  try{r=act(el.getAttribute('data-a'),el);}catch(err){console.error(err);toast(T('Something went wrong. Please try again.'));return;}
+  if(r!==false)render();
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){if(state.conf)state.conf=null;else if(state.sheet)state.sheet=null;else return;render();}
+});
+
+/* ---------- repair, expense and delivery saves ---------- */
+function repairSave(){
+  var s=state.sheet,r=s.id?find(db.repairs,s.id):null,f=state.f,now=Date.now();
+  var device=(f.f_dv||'').trim();if(!device)return showErr(T('Enter the device.'));
+  var vals={customer:(f.f_cu||'').trim(),phone:(f.f_ph||'').trim(),device:device,imei:(f.f_im||'').trim(),problem:(f.f_pr||'').trim(),estimate:num(f.f_es),notes:(f.f_nt||'').trim()};
+  if(r){extend(r,vals);save();toast(T('Saved'));openSheet({t:'repair',id:r.id});return false;}
+  var nr=extend({id:uid(),ts:now,status:'received',parts:[],otherCost:0},vals);
+  db.repairs.push(nr);log('repair','Repair received: {d} from {c}',{d:device,c:vals.customer||'-'},now);save();
+  setTab('repair');state.repairFilter='open';state.repairQ='';toast(T('Repair added'));openSheet({t:'repair',id:nr.id});return false;
+}
+function expenseSave(){
+  var s=state.sheet,e=s.id?find(db.expenses,s.id):null,f=state.f;
+  var amt=num(f.f_amt);if(!amt)return showErr(T('Enter the amount.'));
+  var day=fromYmd(f.f_date)||startOfDay(Date.now()),ts=e?e.ts:Date.now();
+  if(!e||startOfDay(e.ts)!==day)ts=day===startOfDay(Date.now())?Date.now():day+43200000;
+  var note=(f.f_note||'').trim();
+  if(e){e.amount=amt;e.cat=f.f_cat;e.note=note;e.method=f.f_m||'Cash';e.ts=ts;log('expense','Expense changed: {c}, {n} Birr',{c:T(e.cat)+(note?' - '+note:''),n:fmt(amt)});save();toast(T('Saved'));openSheet({t:'expense',id:e.id});return false;}
+  var ne={id:uid(),ts:ts,amount:amt,cat:f.f_cat,note:note,method:f.f_m||'Cash',ref:null};
+  db.expenses.push(ne);log('expense','Expense recorded: {c}, {n} Birr',{c:T(ne.cat)+(note?' - '+note:''),n:fmt(amt)},ts);save();
+  state.expDate=ymd(ts);state.sheet=null;toast(T('Expense saved'));
+}
+function deliverGo(id){
+  var r=find(db.repairs,id),f=state.f,fee=num(f.f_fee);
+  if(!fee)return showErr(T('Enter the final price.'));
+  var raw=String(f.f_paid==null?'':f.f_paid).trim(),paid=raw===''?fee:Math.min(num(raw),fee);
+  if(paid<fee&&!r.customer)return showErr(T('Add the customer name on the repair when part of the payment is still owed.'));
+  var sale=deliverRepair(r,fee,f.f_m||'Cash',paid,num(f.f_oc));
+  toast(T('Repair delivered'));openSheet({t:'sale',id:sale.id,done:T('Repair recorded as a sale.')});return false;
+}
+
+addEventListener('input',function(e){var c=e.target&&e.target.getAttribute&&e.target.getAttribute('data-col');if(c){db.settings[c]=e.target.value;save();applyTheme();}});
+addEventListener('beforeinstallprompt',function(e){e.preventDefault();});
+
+/* Shop Stock start-up. */
+(function(){
+  db=load();
+  if(!db){db=seed();save();}
+  applyTheme();
+  try{history.replaceState({d:0},'');}catch(e){}
+  try{var mq=window.matchMedia('(prefers-color-scheme: dark)');var f=function(){if(db.settings.mode==='auto'){applyTheme();render();}};if(mq.addEventListener)mq.addEventListener('change',f);}catch(e){}
+  render();
+  if(window.__REGISTER_SW__){try{if('serviceWorker' in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}catch(e){}}
+})();
+
+})();
+</script>
+</body>
+</html>
